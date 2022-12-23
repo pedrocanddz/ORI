@@ -299,8 +299,6 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
     }
     tmbuf->tm_mday = dayno + 1;
     tmbuf->tm_isdst = 0;
-    tmbuf->tm_gmtoff = 0;
-    tmbuf->tm_zone = "UTC";
     return tmbuf;
 }
 
@@ -1265,7 +1263,7 @@ char *strlower(char *str) {
 
 
 /* Funções da busca binária */
-void* busca_binaria(const void *key, const void *base0, size_t nmemb, size_t size, int (*compar)(const void *, const void *), bool exibir_caminho, int posicao_caso_repetido, int retorno_se_nao_encontrado) {
+void* busca_binaria(const void *key, const void *base0, size_t nmemb, size_t size, int (*compar)(const void *, const void *), bool exibir_caminho, int retorno_se_nao_encontrado) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "busca_binaria");
 }
