@@ -878,7 +878,7 @@ void criar_cursos_idx() {
     for(unsigned i = 0; i < qtd_registros_cursos; i++){
         Curso c = recuperar_registro_curso(i);
 
-        if(strcmp(c.id_curso, "*|, 2") == 0)
+        if(strcmp(c.id_curso, "*|", 2) == 0)
             cursos_idx[i].rrn = -1;
         else
             cursos_idx[i].rrn = i;
@@ -902,8 +902,10 @@ void criar_inscricoes_idx() {
     for(unsigned i = 0; i < qtd_registros_inscricoes; i++){
         Inscricao i = recuperar_registro_inscricao(i);
 		
-		strcpy(inscricoes_idx[i].id_curso, i.id_curso);
-		strcpy(inscricoes_idx[i].id_usuario, i.id_usuario);
+        if(strcmp(i.id_curso, "*|", 2)){
+		    strcpy(inscricoes_idx[i].id_curso, i.id_curso);
+		    strcpy(inscricoes_idx[i].id_usuario, i.id_usuario);
+        }
     }
     qsort(inscricoes_idx, qtd_registros_inscricoes, sizeof(inscricoes_idx), qsort_inscricoes_idx);
     printf(INDICE_CRIADO, "criar_inscricoes_idx");
@@ -911,19 +913,56 @@ void criar_inscricoes_idx() {
  
 /* Cria o índice secundário titulo_idx */
 void criar_titulo_idx() {
+    if(!titulo_idx)
+        titulo_idx = malloc(sizeof(titulo_idx) * qtd_registros_cursos);
+    if(!titulo_idx){
+        printf(ERRO_MEMORIA_INSUFICIENTE);
+        exit(1);
+    }
+
+    for(unsigned i = 0; i < qtd_registros_cursos; i++){
+        if(!cursos_idx[i].rrn == -1){
+            Curso c = recuperar_registro_curso(i);
+            strcpy(titulo_idx[i].id_curso, c.id_curso);
+            strcpy(titulo_idx[i].id_curso, c.titulo);
+        }
+    }
+
+    qsort(titulo_idx, qtd_registros_cursos, sizeof(titulo_idx), qsort_titulo_idx);
+    
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "criar_titulo_idx");
+    //printf(ERRO_NAO_IMPLEMENTADO, "criar_titulo_idx");
 }
  
 /* Cria o índice secundário data_curso_usuario_idx */
 void criar_data_curso_usuario_idx() {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "criar_data_curso_usuario_idx");
+    if(!data_curso_usuario_idx)
+        data_curso_usuario_idx = malloc(sizeof(data_curso_usuario_index) * qtd_registros_inscricoes);
+    if(!data_curso_usuario_idx){
+        printf(ERRO_MEMORIA_INSUFICIENTE);
+        exit(1);
+    }
+    for(unsigned i = 0; i < qtd_registros_inscricoes; i ++){
+        if(!inscricoes_idx[i].rrn == -1){
+            Inscricao i = recuperar_registro_inscricao(i);
+            strcpy(data_curso_usuario_idx[i].id_curso, i.id_curso);
+            strcpy(data_curso_usuario_idx[i].id_usuario, i.id_usuario);
+            strcpy(data_curso_usuario_idx[i].data, i.data_inscricao);
+        }
+    }
+    qsort(data_curso_usuario_idx, qtd_registros_inscricoes, sizeof(data_curso_usuario_idx), qsort_data_curso_usuario_idx);
+    printf(INDICE_CRIADO, "criar_data_curso_usuario_idx");
 }
  
 /* Cria os índices (secundário e primário) de categorias_idx */
 void criar_categorias_idx() {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+    categorias_idx = (inverted_list) malloc(sizeof(inverted_list));
+    if(!categorias_idx){
+        printf(ERRO_MEMORIA_INSUFICIENTE);
+        exit(1);
+    }
     printf(ERRO_NAO_IMPLEMENTADO, "criar_categorias_idx");
 }
  
