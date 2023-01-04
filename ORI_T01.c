@@ -299,6 +299,8 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
     }
     tmbuf->tm_mday = dayno + 1;
     tmbuf->tm_isdst = 0;
+    tmbuf->tm_gmtoff = 0;
+    tmbuf->tm_zone = "UTC";
     return tmbuf;
 }
 
@@ -867,12 +869,40 @@ void criar_usuarios_idx() {
 /* Cria o índice primário cursos_idx */
 void criar_cursos_idx() {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "criar_cursos_idx");
+    if(!cursos_idx)
+        cursos_idx = malloc(MAX_REGISTROS * sizeof(cursos_idx));
+    if(!cursos_idx){
+        printf(ERRO_MEMORIA_INSUFICIENTE);
+        exit(1);
+    }
+    for(unsigned i = 0; i < qtd_registros_cursos; i++){
+        Curso c = recuperar_registro_curso(i);
+
+        if(strcmp(c.id_curso, "*|, 2") == 0)
+            cursos_idx[i].rrn = -1;
+        else
+            cursos_idx[i].rrn = i;
+        
+        strcpy(cursos_idx[i].id_curso, c.id_curso);
+    }
+    qsort(cursos_idx, qtd_registros_cursos, sizeof(cursos_idx), qsort_cursos_idx);
+    printf(INDICE_CRIADO, "criar_cursos_idx");
 }
  
 /* Cria o índice primário inscricoes_idx */
 void criar_inscricoes_idx() {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+    if(!inscricoes_idx)
+        inscricoes_idx = malloc(sizeof(inscricoes_idx) * MAX_REGISTROS);
+    if(!inscricoes_idx){
+        printf(ERRO_MEMORIA_INSUFICIENTE);
+        exit(1);
+    }
+
+    for(unsigned i = 0; i < qtd_registros_inscricoes; i++){
+        Inscricao i = recuperar_registro_inscricao(i);
+
+    }
     printf(ERRO_NAO_IMPLEMENTADO, "criar_inscricoes_idx");
 }
  
@@ -986,8 +1016,7 @@ void escrever_registro_usuario(Usuario u, int rrn) {
     strcat(temp, p);
     strcat(temp, ";");
  
-    for (int i = strlen(temp); i < TAM_REGISTRO_USUARIO; i++)
-        temp[i] = '#';
+    strpadright(temp, '#', TAM_REGISTRO_USUARIO);
  
     strncpy(ARQUIVO_USUARIOS + rrn*TAM_REGISTRO_USUARIO, temp, TAM_REGISTRO_USUARIO);
     ARQUIVO_USUARIOS[qtd_registros_usuarios*TAM_REGISTRO_USUARIO] = '\0';
