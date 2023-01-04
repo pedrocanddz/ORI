@@ -901,9 +901,12 @@ void criar_inscricoes_idx() {
 
     for(unsigned i = 0; i < qtd_registros_inscricoes; i++){
         Inscricao i = recuperar_registro_inscricao(i);
-
+		
+		strcpy(inscricoes_idx[i].id_curso, i.id_curso);
+		strcpy(inscricoes_idx[i].id_usuario, i.id_usuario);
     }
-    printf(ERRO_NAO_IMPLEMENTADO, "criar_inscricoes_idx");
+    qsort(inscricoes_idx, qtd_registros_inscricoes, sizeof(inscricoes_idx), qsort_inscricoes_idx);
+    printf(INDICE_CRIADO, "criar_inscricoes_idx");
 }
  
 /* Cria o índice secundário titulo_idx */
