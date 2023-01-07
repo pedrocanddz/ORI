@@ -958,11 +958,7 @@ void criar_data_curso_usuario_idx() {
 /* Cria os índices (secundário e primário) de categorias_idx */
 void criar_categorias_idx() {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    categorias_idx = (inverted_list) malloc(sizeof(inverted_list));
-    if(!categorias_idx){
-        printf(ERRO_MEMORIA_INSUFICIENTE);
-        exit(1);
-    }
+    
     printf(ERRO_NAO_IMPLEMENTADO, "criar_categorias_idx");
 }
  
