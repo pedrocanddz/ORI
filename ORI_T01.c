@@ -506,12 +506,12 @@ void clear_input(char *str) {
  * ========================================================================== */
  
 /* Cria o índice respectivo */
-void criar_usuarios_idx();
-void criar_cursos_idx();
-void criar_inscricoes_idx();
-void criar_titulo_idx();
-void criar_data_curso_usuario_idx();
-void criar_categorias_idx();
+void criar_usuarios_idx(); //  ok
+void criar_cursos_idx();// ok
+void criar_inscricoes_idx();// ok
+void criar_titulo_idx();// ok
+void criar_data_curso_usuario_idx(); //ok
+void criar_categorias_idx();// em progresso
  
 /* Exibe um registro com base no RRN */
 bool exibir_usuario(int rrn);
@@ -1025,14 +1025,60 @@ Usuario recuperar_registro_usuario(int rrn) {
  * informado e retorna os dados na struct Curso */
 Curso recuperar_registro_curso(int rrn) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "recuperar_registro_curso");
+    Curso c;
+    char temp[TAM_REGISTRO_CURSO + 1], *p;
+    strncpy(temp, ARQUIVO_CURSOS + (rrn * TAM_REGISTRO_CURSO), TAM_REGISTRO_CURSO);
+    temp[TAM_REGISTRO_CURSO] = '\0';
+
+    p = strtok(temp, ';');
+    strcpy(c.id_curso, p);
+    p = strtok(NULL, ';');
+    strcpy(c.titulo, p);
+    p = strtok(NULL, ';');
+    strcpy(c.instituicao, p);
+    p = strtok(NULL, ';');
+    strcpy(c.ministrante, p);
+    p = strtok(NULL, ';');
+    strcpy(c.lancamento, p);
+    p = strtok(NULL, ';');
+    strcpy(c.carga, p);
+    p = strtok(NULL, ';');
+    strcpy(c.valor, p);
+    //Aqui começa as categorias
+    p = strtok(NULL, ';');
+    strcpy(c.categorias, p);
+
+    return c;
+    //printf(ERRO_NAO_IMPLEMENTADO, "recuperar_registro_curso");
 }
  
 /* Recupera do arquivo de inscricoes o registro com o RRN
  * informado e retorna os dados na struct Inscricao */
 Inscricao recuperar_registro_inscricao(int rrn) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "recuperar_registro_inscricao");
+    Inscricao i;
+    char temp[TAM_REGISTRO_INSCRICAO + 1], *p;
+    strcpy(temp, ARQUIVO_INSCRICOES + (rrn * TAM_REGISTRO_INSCRICAO), TAM_REGISTRO_INSCRICAO);
+    temp[TAM_REGISTRO_INSCRICAO] = '\0';
+
+    p = temp;
+    strcpy(p, temp, 8);
+    strcpy(i.id_curso, p);
+
+    strcpy(p, temp[8], 11);
+    strcpy(i.id_usuario, p);
+
+    strcpy(p, temp[19], 12)
+    strcpy(i.data_inscricao, p);
+
+    strcpy(p, temp[31], 1)
+    strcpy(i.status, p);
+    
+    strcpy(p, temp[32], 12)
+    strcpy(i.data_atualizacao, p);
+
+    return i;
+    //printf(ERRO_NAO_IMPLEMENTADO, "recuperar_registro_inscricao");
 }
  
  
@@ -1064,21 +1110,68 @@ void escrever_registro_usuario(Usuario u, int rrn) {
  * os dados na struct Curso */
 void escrever_registro_curso(Curso j, int rrn) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "escrever_registro_curso");
+    char temp[TAM_REGISTRO_CURSO + 1], p[100];
+    temp[0] = '\0'; p[0] = '\0';
+    int tam_max = 256;
+
+    strcpy(temp, j.id_curso);
+    strcat(temp, ';');
+    strcat(temp, j.titulo);
+    strcat(temp, ';');
+    strcat(temp, j.instituicao);
+    strcat(temp, ';');
+    strcat(temp, j.ministrante);
+    strcat(temp, ';');
+    strcat(temp, j.lancamento);
+    strcat(temp, ';');
+    strcat(temp, j.carga);
+    strcat(temp, ';');
+    strcat(temp, j.valor);
+    strcat(temp, ';');
+    sprintf(p, "%013.2lf", j.valor);
+    strcat(temp, p);
+    strcat(temp, ";");
+    strcat(temp, j.categorias);
+    strcat(temp, ';');
+    int tam_atual = strlen(temp);
+    while(tam_atual != tam_max){
+        strcat(temp, '#');
+        tam_atual++;
+    }
+    strncpy(ARQUIVO_CURSOS + rrn * TAM_REGISTRO_CURSO, temp, TAM_REGISTRO_CURSO);
+    ARQUIVO_CURSOS[qtd_registros_cursos* TAM_REGISTRO_CURSO] = '\0';
+    //printf(ERRO_NAO_IMPLEMENTADO, "escrever_registro_curso");
 }
  
 /* Escreve no arquivo de inscricoes na posição informada (RRN)
  * os dados na struct Inscricao */
 void escrever_registro_inscricao(Inscricao c, int rrn) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "escrever_registro_inscricao");
+    char temp[TAM_REGISTRO_INSCRICAO + 1];
+    temp[0] = '\0';
+    
+    strcpy(temp, c.id_curso);
+    strcat(temp, c.id_usuario);
+    strcat(temp, c.data_inscricao);
+    strcat(temp, c.status);
+    strcat(temp, c.data_atualizacao);
+
+    strncpy(ARQUIVO_INSCRICOES + rrn*TAM_REGISTRO_INSCRICAO, temp, TAM_REGISTRO_INSCRICAO);
+    ARQUIVO_INSCRICOES[qtd_registros_inscricoes * TAM_REGISTRO_INSCRICAO] = '\0';
+    //printf(ERRO_NAO_IMPLEMENTADO, "escrever_registro_inscricao");
 }
  
  
 /* Funções principais */
 void cadastrar_usuario_menu(char *id_usuario, char *nome, char *email, char *telefone) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_usuario_menu");
+    Usuario new;
+    strcpy(new.id_usuario, id_usuario);
+    strcpy(new.nome, nome);
+    strcpy(new.email, email);
+    strcpy(new.telefone, telefone);
+    strcpy(new.saldo, '0');
+    //printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_usuario_menu");
 }
  
 void cadastrar_telefone_menu(char* id_usuario, char* telefone) {
