@@ -520,14 +520,14 @@ bool exibir_inscricao(int rrn);
  
 /* Recupera do arquivo o registro com o RRN informado
  * e retorna os dados nas structs Usuario, Curso e Inscricao */
-Usuario recuperar_registro_usuario(int rrn);
-Curso recuperar_registro_curso(int rrn);
-Inscricao recuperar_registro_inscricao(int rrn);
+Usuario recuperar_registro_usuario(int rrn);//ok
+Curso recuperar_registro_curso(int rrn);//ok
+Inscricao recuperar_registro_inscricao(int rrn); //ok
  
 /* Escreve em seu respectivo arquivo na posição informada (RRN) */
-void escrever_registro_usuario(Usuario u, int rrn);
-void escrever_registro_curso(Curso j, int rrn);
-void escrever_registro_inscricao(Inscricao c, int rrn);
+void escrever_registro_usuario(Usuario u, int rrn);//ok
+void escrever_registro_curso(Curso j, int rrn);//ok
+void escrever_registro_inscricao(Inscricao c, int rrn);//ok
  
 /* Funções principais */
 void cadastrar_usuario_menu(char* id_usuario, char* nome, char* email, char* telefone);
@@ -1043,7 +1043,7 @@ Curso recuperar_registro_curso(int rrn) {
     p = strtok(NULL, ';');
     strcpy(c.carga, p);
     p = strtok(NULL, ';');
-    strcpy(c.valor, p);
+    c.valor = atof(p);
     //Aqui começa as categorias
     p = strtok(NULL, ';');
     strcpy(c.categorias, p);
@@ -1068,13 +1068,13 @@ Inscricao recuperar_registro_inscricao(int rrn) {
     strcpy(p, temp[8], 11);
     strcpy(i.id_usuario, p);
 
-    strcpy(p, temp[19], 12)
+    strcpy(p, temp[19], 12);
     strcpy(i.data_inscricao, p);
 
-    strcpy(p, temp[31], 1)
+    strcpy(p, temp[31], 1);
     strcpy(i.status, p);
     
-    strcpy(p, temp[32], 12)
+    strcpy(p, temp[32], 12);
     strcpy(i.data_atualizacao, p);
 
     return i;
@@ -1126,8 +1126,6 @@ void escrever_registro_curso(Curso j, int rrn) {
     strcat(temp, ';');
     strcat(temp, j.carga);
     strcat(temp, ';');
-    strcat(temp, j.valor);
-    strcat(temp, ';');
     sprintf(p, "%013.2lf", j.valor);
     strcat(temp, p);
     strcat(temp, ";");
@@ -1170,12 +1168,14 @@ void cadastrar_usuario_menu(char *id_usuario, char *nome, char *email, char *tel
     strcpy(new.nome, nome);
     strcpy(new.email, email);
     strcpy(new.telefone, telefone);
-    strcpy(new.saldo, '0');
+    sprintf(0, "%013.2lf", new.saldo);
+    //strcpy(new.saldo, '0');
     //printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_usuario_menu");
 }
  
 void cadastrar_telefone_menu(char* id_usuario, char* telefone) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+    
     printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_telefone_menu");
 }
  
