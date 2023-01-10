@@ -921,7 +921,7 @@ void criar_titulo_idx() {
     }
 
     for(unsigned i = 0; i < qtd_registros_cursos; i++){
-        if(!cursos_idx[i].rrn == -1){
+        if(cursos_idx[i].rrn != -1){
             Curso c = recuperar_registro_curso(i);
             strcpy(titulo_idx[i].id_curso, c.id_curso);
             strcpy(titulo_idx[i].id_curso, c.titulo);
@@ -958,7 +958,7 @@ void criar_data_curso_usuario_idx() {
 /* Cria os índices (secundário e primário) de categorias_idx */
 void criar_categorias_idx() {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    
+
     printf(ERRO_NAO_IMPLEMENTADO, "criar_categorias_idx");
 }
  
@@ -1064,16 +1064,12 @@ Inscricao recuperar_registro_inscricao(int rrn) {
     p = temp;
     strcpy(p, temp, 8);
     strcpy(i.id_curso, p);
-
     strcpy(p, temp[8], 11);
     strcpy(i.id_usuario, p);
-
     strcpy(p, temp[19], 12);
     strcpy(i.data_inscricao, p);
-
     strcpy(p, temp[31], 1);
     strcpy(i.status, p);
-    
     strcpy(p, temp[32], 12);
     strcpy(i.data_atualizacao, p);
 
@@ -1131,14 +1127,12 @@ void escrever_registro_curso(Curso j, int rrn) {
     strcat(temp, ";");
     strcat(temp, j.categorias);
     strcat(temp, ';');
-    int tam_atual = strlen(temp);
-    while(tam_atual != tam_max){
-        strcat(temp, '#');
-        tam_atual++;
-    }
+
+    strpadright(temp, '#', TAM_REGISTRO_CURSO);
+    
     strncpy(ARQUIVO_CURSOS + rrn * TAM_REGISTRO_CURSO, temp, TAM_REGISTRO_CURSO);
     ARQUIVO_CURSOS[qtd_registros_cursos* TAM_REGISTRO_CURSO] = '\0';
-    //printf(ERRO_NAO_IMPLEMENTADO, "escrever_registro_curso");
+    
 }
  
 /* Escreve no arquivo de inscricoes na posição informada (RRN)
@@ -1156,7 +1150,7 @@ void escrever_registro_inscricao(Inscricao c, int rrn) {
 
     strncpy(ARQUIVO_INSCRICOES + rrn*TAM_REGISTRO_INSCRICAO, temp, TAM_REGISTRO_INSCRICAO);
     ARQUIVO_INSCRICOES[qtd_registros_inscricoes * TAM_REGISTRO_INSCRICAO] = '\0';
-    //printf(ERRO_NAO_IMPLEMENTADO, "escrever_registro_inscricao");
+    
 }
  
  
@@ -1164,13 +1158,16 @@ void escrever_registro_inscricao(Inscricao c, int rrn) {
 void cadastrar_usuario_menu(char *id_usuario, char *nome, char *email, char *telefone) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     Usuario new;
+    //buscar por id_usuario igual
     strcpy(new.id_usuario, id_usuario);
     strcpy(new.nome, nome);
     strcpy(new.email, email);
+    //tratar sem entrada de telefone
     strcpy(new.telefone, telefone);
     sprintf(0, "%013.2lf", new.saldo);
-    //strcpy(new.saldo, '0');
+    
     //printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_usuario_menu");
+    
 }
  
 void cadastrar_telefone_menu(char* id_usuario, char* telefone) {
@@ -1340,6 +1337,7 @@ void imprimir_categorias_primario_idx_menu() {
 /* Liberar memória e encerrar programa */
 void liberar_memoria_menu() {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+
     printf(ERRO_NAO_IMPLEMENTADO, "liberar_memoria_menu");
 }
  
@@ -1352,35 +1350,62 @@ int qsort_usuarios_idx(const void *a, const void *b) {
 /* Função de comparação entre chaves do índice cursos_idx */
 int qsort_cursos_idx(const void *a, const void *b) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "qsort_cursos_idx");
+    return strcmp(((cursos_index *)a)->id_curso, ((cursos_index *)b)->id_curso);
+    //printf(ERRO_NAO_IMPLEMENTADO, "qsort_cursos_idx");
 }
  
 /* Função de comparação entre chaves do índice inscricoes_idx */
 int qsort_inscricoes_idx(const void *a, const void *b) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "qsort_inscricoes_idx");
+    
+    if(strcmp(((inscricoes_index*)a)->id_curso, ((inscricoes_index*)b)->id_curso) > 0){
+        return 1;
+    }else if(strcmp(((inscricoes_index*)a)->id_usuario, ((inscricoes_index*)b)->id_usuario) < 0){
+        return -1;
+    }else{
+        return 1;
+    }
+    return 0; //caso nada passe
+    //printf(ERRO_NAO_IMPLEMENTADO, "qsort_inscricoes_idx");
 }
  
 /* Função de comparação entre chaves do índice titulo_idx */
 int qsort_titulo_idx(const void *a, const void *b) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+    return strcmp(((titulos_index *)a)->id_curso, ((titulos_index *)b)->id_curso);
     printf(ERRO_NAO_IMPLEMENTADO, "qsort_titulo_idx");
 }
  
 /* Funções de comparação entre chaves do índice data_curso_usuario_idx */
 int qsort_data_idx(const void *a, const void *b) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+    if(strcmp(((data_curso_usuario_index *)a)->data, ((data_curso_usuario_index *)b)->data) < 0){
+        if(strcmp(((data_curso_usuario_index *)a)->id_curso, ((data_curso_usuario_index *)b)->id_curso) < 0){
+            if(strcmp(((data_curso_usuario_index *)a)->id_usuario, ((data_curso_usuario_index *)b)->id_usuario) < 0){
+                return -1;
+            }else{
+                return 1;
+            }
+            return 0;
+        }else{
+            return 1;
+        }
+    }else{
+        return 1;
+    }
     printf(ERRO_NAO_IMPLEMENTADO, "qsort_data_idx");
 }
  
 int qsort_data_curso_usuario_idx(const void *a, const void *b) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+
     printf(ERRO_NAO_IMPLEMENTADO, "qsort_data_curso_usuario_idx");
 }
  
 /* Função de comparação entre chaves do índice secundário de categorias_idx */
 int qsort_categorias_secundario_idx(const void *a, const void *b) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+
     printf(ERRO_NAO_IMPLEMENTADO, "qsort_categorias_secundario_idx");
 }
  
@@ -1388,11 +1413,13 @@ int qsort_categorias_secundario_idx(const void *a, const void *b) {
 /* Funções de manipulação de Lista Invertida */
 void inverted_list_insert(char *chave_secundaria, char *chave_primaria, inverted_list *t) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+
     printf(ERRO_NAO_IMPLEMENTADO, "inverted_list_insert");
 }
  
 bool inverted_list_secondary_search(int *result, bool exibir_caminho, char *chave_secundaria, inverted_list *t) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+
     printf(ERRO_NAO_IMPLEMENTADO, "inverted_list_secondary_search");
 }
  
@@ -1425,5 +1452,24 @@ char *strlower(char *str) {
 /* Funções da busca binária */
 void* busca_binaria(const void *key, const void *base0, size_t nmemb, size_t size, int (*compar)(const void *, const void *), bool exibir_caminho, int retorno_se_nao_encontrado) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "busca_binaria");
+    size_t start = 0, end = nmemb;
+    size_t middle;
+    while(start < end){
+        middle = (start + end) / 2;
+
+        const void *base = (char *)base0 + middle * size;
+        int result = compar(key, base);
+        if(result == 0){ // achou
+            return (void *)base;
+        }else if(result < 0){
+            end = middle;
+        }else{
+            start = middle + 1;
+        }
+        if(exibir_caminho){
+            printf("%d ", middle);
+        }
+    }
+    return (void *)retorno_se_nao_encontrado;
+    //printf(ERRO_NAO_IMPLEMENTADO, "busca_binaria");
 }
