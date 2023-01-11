@@ -511,7 +511,7 @@ void criar_cursos_idx();// ok
 void criar_inscricoes_idx();// ok
 void criar_titulo_idx();// ok
 void criar_data_curso_usuario_idx(); //ok
-void criar_categorias_idx();// em progresso
+void criar_categorias_idx();// ok
  
 /* Exibe um registro com base no RRN */
 bool exibir_usuario(int rrn);
@@ -914,7 +914,7 @@ void criar_inscricoes_idx() {
 /* Cria o índice secundário titulo_idx */
 void criar_titulo_idx() {
     if(!titulo_idx)
-        titulo_idx = malloc(sizeof(titulo_idx) * qtd_registros_cursos);
+        titulo_idx = malloc(sizeof(titulo_idx) * MAX_REGISTROS);
     if(!titulo_idx){
         printf(ERRO_MEMORIA_INSUFICIENTE);
         exit(1);
@@ -938,7 +938,7 @@ void criar_titulo_idx() {
 void criar_data_curso_usuario_idx() {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     if(!data_curso_usuario_idx)
-        data_curso_usuario_idx = malloc(sizeof(data_curso_usuario_index) * qtd_registros_inscricoes);
+        data_curso_usuario_idx = malloc(sizeof(data_curso_usuario_index) * MAX_REGISTROS);
     if(!data_curso_usuario_idx){
         printf(ERRO_MEMORIA_INSUFICIENTE);
         exit(1);
@@ -958,8 +958,70 @@ void criar_data_curso_usuario_idx() {
 /* Cria os índices (secundário e primário) de categorias_idx */
 void criar_categorias_idx() {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+    categorias_idx.qtd_registros_primario = 0;
+    categorias_idx.qtd_registros_secundario = 0; //categorias
 
-    printf(ERRO_NAO_IMPLEMENTADO, "criar_categorias_idx");
+    categorias_idx.tam_chave_primaria = TAM_ID_CURSO;
+    categorias_idx.tam_chave_secundaria = TAM_MAX_CATEGORIA;
+
+    if(!categorias_idx.categorias_primario_idx)
+        categorias_idx.categorias_primario_idx = malloc(sizeof(categorias_primario_index) * MAX_REGISTROS);
+    if(!categorias_idx.categorias_primario_idx){
+        printf(ERRO_MEMORIA_INSUFICIENTE);
+        exit(1);
+    }
+
+    if(!categorias_idx.categorias_secundario_idx)
+        categorias_idx.categorias_secundario_idx = malloc(sizeof(categorias_secundario_index) * MAX_REGISTROS);
+    if(!categorias_idx.categorias_secundario_idx){
+        printf(ERRO_MEMORIA_INSUFICIENTE);
+        exit(1);
+    }
+    for(unsigned i = 0; i < qtd_registros_cursos; i++){
+        Curso c = recuperar_registro_curso(i);
+        //strcpy(categorias_idx.categorias_primario_idx[i].chave_primaria, c.id_curso);
+        
+        //categorias
+        char *p;
+        strcpy(p, c.categorias);
+        char *token = strtok(p, "|");
+        while(token != NULL){
+            //checar se a categoria já existe e pegar a posição caso exista
+            bool existe = false;
+            int pos;
+            for(int j = 0 ; i < categorias_idx.qtd_registros_secundario; j++){
+                if(strcmp(categorias_idx.categorias_secundario_idx[j].chave_secundaria, token) == 0){
+                    existe = true;
+                    pos = j;
+                    break;
+                }
+            }
+            if(!existe){//se não existe colocar na ultima posição como categoria nova
+
+                strcpy(categorias_idx.categorias_secundario_idx[categorias_idx.qtd_registros_secundario].chave_secundaria, token);
+                categorias_idx.categorias_secundario_idx[categorias_idx.qtd_registros_secundario].primeiro_indice = categorias_idx.qtd_registros_primario;
+                categorias_idx.qtd_registros_secundario++;
+
+                strcpy(categorias_idx.categorias_primario_idx[categorias_idx.qtd_registros_primario].chave_primaria, c.id_curso);
+                categorias_idx.categorias_primario_idx[categorias_idx.qtd_registros_primario].proximo_indice = -1;
+                categorias_idx.qtd_registros_primario++;
+
+            }else{//se existir colocar na posição encontrada
+                int id_curso = categorias_idx.categorias_secundario_idx[pos].primeiro_indice;
+                while(categorias_idx.categorias_primario_idx[id_curso].proximo_indice != -1)
+                    id_curso = categorias_idx.categorias_primario_idx[id_curso].proximo_indice;
+                
+                categorias_idx.categorias_primario_idx[id_curso].proximo_indice = categorias_idx.qtd_registros_primario;
+                categorias_idx.categorias_primario_idx[categorias_idx.qtd_registros_primario].proximo_indice = -1; 
+                strcpy(categorias_idx.categorias_primario_idx[categorias_idx.qtd_registros_primario].chave_primaria, c.id_curso);
+                categorias_idx.qtd_registros_primario++;
+
+            }
+            token = strtok(NULL, "|");
+        }
+    }
+    qsort(categorias_idx.categorias_secundario_idx, categorias_idx.qtd_registros_secundario, sizeof(categorias_secundario_index), qsort_categorias_secundario_idx);
+    printf(INDICE_CRIADO, "criar_categorias_idx");
 }
  
  
@@ -1393,19 +1455,32 @@ int qsort_data_idx(const void *a, const void *b) {
     }else{
         return 1;
     }
-    printf(ERRO_NAO_IMPLEMENTADO, "qsort_data_idx");
+    //printf(ERRO_NAO_IMPLEMENTADO, "qsort_data_idx");
 }
  
 int qsort_data_curso_usuario_idx(const void *a, const void *b) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-
-    printf(ERRO_NAO_IMPLEMENTADO, "qsort_data_curso_usuario_idx");
+    if(strcmp(((data_curso_usuario_index *)a)->id_curso, ((data_curso_usuario_index *)b)->id_curso) < 0){
+        if(strcmp(((data_curso_usuario_index *)a)->id_usuario, ((data_curso_usuario_index *)b)->id_usuario) < 0){
+            if(strcmp(((data_curso_usuario_index *)a)->data, ((data_curso_usuario_index *)b)->data) < 0){
+                return -1;
+            }else{
+                return 1;
+            }
+            return 0;
+        }else{
+            return 1;
+        }
+    }else{
+        return 1;
+    }
+    //printf(ERRO_NAO_IMPLEMENTADO, "qsort_data_curso_usuario_idx");
 }
  
 /* Função de comparação entre chaves do índice secundário de categorias_idx */
 int qsort_categorias_secundario_idx(const void *a, const void *b) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-
+    return(((categorias_secundario_index *)a)->chave_secundaria, (( categorias_secundario_index *)b)->chave_secundaria);
     printf(ERRO_NAO_IMPLEMENTADO, "qsort_categorias_secundario_idx");
 }
  
@@ -1413,7 +1488,7 @@ int qsort_categorias_secundario_idx(const void *a, const void *b) {
 /* Funções de manipulação de Lista Invertida */
 void inverted_list_insert(char *chave_secundaria, char *chave_primaria, inverted_list *t) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-
+    
     printf(ERRO_NAO_IMPLEMENTADO, "inverted_list_insert");
 }
  
@@ -1452,7 +1527,7 @@ char *strlower(char *str) {
 /* Funções da busca binária */
 void* busca_binaria(const void *key, const void *base0, size_t nmemb, size_t size, int (*compar)(const void *, const void *), bool exibir_caminho, int retorno_se_nao_encontrado) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    size_t start = 0, end = nmemb;
+    size_t start = 0, end = nmemb - 1;
     size_t middle;
     while(start < end){
         middle = (start + end) / 2;
