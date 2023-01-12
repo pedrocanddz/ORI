@@ -1488,18 +1488,77 @@ int qsort_categorias_secundario_idx(const void *a, const void *b) {
 /* Funções de manipulação de Lista Invertida */
 void inverted_list_insert(char *chave_secundaria, char *chave_primaria, inverted_list *t) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    
-    printf(ERRO_NAO_IMPLEMENTADO, "inverted_list_insert");
+    char *p;
+        strcpy(p, chave_secundaria);
+        char *token = strtok(p, "|");
+        while(token != NULL){
+            //checar se a categoria já existe e pegar a posição caso exista
+            bool existe = false;
+            int pos;
+            for(int j = 0 ; j < t->qtd_registros_secundario; j++){
+                if(strcmp(t->categorias_secundario_idx[j].chave_secundaria, token) == 0){
+                    existe = true;
+                    pos = j;
+                    break;
+                }
+            }
+            if(!existe){//se não existe colocar na ultima posição como categoria nova
+                //lido com a chave secundária
+                strcpy(t->categorias_secundario_idx[t->qtd_registros_secundario].chave_secundaria, token);
+                t->categorias_secundario_idx[t->qtd_registros_secundario].primeiro_indice = t->qtd_registros_primario;
+                t->qtd_registros_secundario++;
+
+                //lido com a chave primária
+                strcpy(t->categorias_primario_idx[t->qtd_registros_primario].chave_primaria, chave_primaria);
+                t->categorias_primario_idx[t->qtd_registros_primario].proximo_indice = -1;
+                t->qtd_registros_primario++;
+
+            }else{//se existir colocar na posição encontrada
+                int id_curso = t->categorias_secundario_idx[pos].primeiro_indice;
+                while(t->categorias_primario_idx[id_curso].proximo_indice != -1)
+                    id_curso = t->categorias_primario_idx[id_curso].proximo_indice;
+                
+                t->categorias_primario_idx[id_curso].proximo_indice = t->qtd_registros_primario;
+                t->categorias_primario_idx[t->qtd_registros_primario].proximo_indice = -1; 
+                strcpy(t->categorias_primario_idx[t->qtd_registros_primario].chave_primaria, chave_primaria);
+                t->qtd_registros_primario++;
+
+            }
+            token = strtok(NULL, "|");
+        }
+    qsort(t->categorias_secundario_idx, t->qtd_registros_secundario, sizeof(categorias_secundario_index),qsort_categorias_secundario_idx);
+    //printf(ERRO_NAO_IMPLEMENTADO, "inverted_list_insert");
 }
  
 bool inverted_list_secondary_search(int *result, bool exibir_caminho, char *chave_secundaria, inverted_list *t) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-
-    printf(ERRO_NAO_IMPLEMENTADO, "inverted_list_secondary_search");
+    categorias_secundario_index *a = busca_binaria(t->categorias_secundario_idx, t->qtd_registros_secundario, sizeof(categorias_secundario_index), chave_secundaria, qsort_categorias_secundario_idx, exibir_caminho, -1);
+    if(a == -1){
+        return false;
+    }else{//buscar todos os ids de curso com categorias
+        int id_curso = a->primeiro_indice;
+        int i = 0;
+        while(id_curso != -1){
+            result[i] = id_curso;
+            id_curso = t->categorias_primario_idx[id_curso].proximo_indice;
+            i++;
+        }
+        return true;
+    }
+    //printf(ERRO_NAO_IMPLEMENTADO, "inverted_list_secondary_search");
 }
  
 int inverted_list_primary_search(char result[][TAM_CHAVE_CATEGORIAS_PRIMARIO_IDX], bool exibir_caminho, int indice, int *indice_final, inverted_list *t) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+    int cursos = 0;
+    while(t->categorias_primario_idx[indice].proximo_indice != -1){
+        strcpy(result[cursos], t->categorias_primario_idx[indice].chave_primaria);
+        indice = t->categorias_primario_idx[indice].proximo_indice;
+        cursos++;
+        indice_final = indice;
+    }
+    return cursos;
+    
     printf(ERRO_NAO_IMPLEMENTADO, "inverted_list_primary_search");
 }
  
@@ -1524,12 +1583,14 @@ char *strlower(char *str) {
 }
 
 
-/* Funções da busca binária */
+/* Funções da busca binária */ 
+/* Função baseada na biblioteca GNU */
 void* busca_binaria(const void *key, const void *base0, size_t nmemb, size_t size, int (*compar)(const void *, const void *), bool exibir_caminho, int retorno_se_nao_encontrado) {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    size_t start = 0, end = nmemb - 1;
+    size_t start = 0;
+    size_t end = nmemb - 1;
     size_t middle;
-    while(start < end){
+    while(start <= end){
         middle = (start + end) / 2;
 
         const void *base = (char *)base0 + middle * size;
