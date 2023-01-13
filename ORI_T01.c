@@ -1084,16 +1084,18 @@ void criar_categorias_idx() {
     // c.id_curso);
 
     // categorias
+    for(int k = 0 ; k < QTD_MAX_CATEGORIAS; k++){
+
     char *p;
-    strcpy(p, c.categorias);
-    char *token = strtok(p, "|");
-    while (token != NULL) {
+    strcpy(p, c.categorias[i]);
       // checar se a categoria já existe e pegar a posição caso exista
+      if(strcmp(p, "") == 0)
+        break;
       bool existe = false;
       int pos;
       for (int j = 0; i < categorias_idx.qtd_registros_secundario; j++) {
         if (strcmp(categorias_idx.categorias_secundario_idx[j].chave_secundaria,
-                   token) == 0) {
+                   p) == 0) {
           existe = true;
           pos = j;
           break;
@@ -1106,7 +1108,7 @@ void criar_categorias_idx() {
                    .categorias_secundario_idx[categorias_idx
                                                   .qtd_registros_secundario]
                    .chave_secundaria,
-               token);
+               p);
         categorias_idx
             .categorias_secundario_idx[categorias_idx.qtd_registros_secundario]
             .primeiro_indice = categorias_idx.qtd_registros_primario;
@@ -1141,11 +1143,11 @@ void criar_categorias_idx() {
                 .categorias_primario_idx[categorias_idx.qtd_registros_primario]
                 .chave_primaria,
             c.id_curso);
-        categorias_idx.qtd_registros_primario++;
-      }
-      token = strtok(NULL, "|");
+            categorias_idx.qtd_registros_primario++;
+        }
+        
     }
-  }
+    }
   qsort(categorias_idx.categorias_secundario_idx,
         categorias_idx.qtd_registros_secundario,
         sizeof(categorias_secundario_index), qsort_categorias_secundario_idx);
@@ -1592,7 +1594,7 @@ void buscar_curso_titulo_menu(char *titulo) {
 /* Listagem */
 void listar_usuarios_id_menu() {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-  
+
   printf(ERRO_NAO_IMPLEMENTADO, "listar_usuarios_id_menu");
 }
 
@@ -1704,8 +1706,13 @@ void imprimir_categorias_primario_idx_menu() {
 /* Liberar memória e encerrar programa */
 void liberar_memoria_menu() {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-
-  printf(ERRO_NAO_IMPLEMENTADO, "liberar_memoria_menu");
+    free(usuarios_idx);
+    free(cursos_idx);
+    free(inscricoes_idx);
+    free(titulo_idx);
+    free(data_curso_usuario_idx);
+    free(categorias_idx.categorias_primario_idx);
+    free(categorias_idx.categorias_secundario_idx);
 }
 
 /* Função de comparação entre chaves do índice usuarios_idx */
@@ -1787,9 +1794,9 @@ int qsort_data_curso_usuario_idx(const void *a, const void *b) {
 /* Função de comparação entre chaves do índice secundário de categorias_idx */
 int qsort_categorias_secundario_idx(const void *a, const void *b) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-  return (((categorias_secundario_index *)a)->chave_secundaria,
+  return strcmp(((categorias_secundario_index *)a)->chave_secundaria,
           ((categorias_secundario_index *)b)->chave_secundaria);
-  printf(ERRO_NAO_IMPLEMENTADO, "qsort_categorias_secundario_idx");
+  //printf(ERRO_NAO_IMPLEMENTADO, "qsort_categorias_secundario_idx");
 }
 
 /* Funções de manipulação de Lista Invertida */
