@@ -1594,18 +1594,49 @@ void buscar_curso_titulo_menu(char *titulo) {
 /* Listagem */
 void listar_usuarios_id_menu() {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-
+  bool sem_usuarios = true;
+  for(int i = 0; i < qtd_registros_usuarios; i++){
+    if(usuarios_idx[i].rrn != -1){
+      sem_usuarios = false;
+      exibir_usuario(usuarios_idx[i].rrn);
+    }
+  }
+  if(sem_usuarios){
+    printf(AVISO_NENHUM_REGISTRO_ENCONTRADO);
+  }
   printf(ERRO_NAO_IMPLEMENTADO, "listar_usuarios_id_menu");
 }
 
 void listar_cursos_categorias_menu(char *categoria) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-  printf(ERRO_NAO_IMPLEMENTADO, "listar_cursos_categorias_menu");
+  imprimir_categorias_primario_idx_menu();
+  categorias_secundario_index *buscar = busca_binaria(categoria, categorias_idx.categorias_secundario_idx, categorias_idx..qtd_registros_secundario, sizeof(categorias_secundario_index), qsort_categorias_secundario_idx, false, NULL);
+  if(!buscar){
+    printf(AVISO_NENHUM_REGISTRO_ENCONTRADO);
+    return;
+  }
+  int registro = buscar->primeiro_indice;
+  while(registro != -1){
+    exibir_curso(registro);
+    registro = categorias_idx.categorias_primario_idx[registro].proximo_indice;
+  }
+  //printf(ERRO_NAO_IMPLEMENTADO, "listar_cursos_categorias_menu");
 }
 
 void listar_inscricoes_periodo_menu(char *data_inicio, char *data_fim) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-  printf(ERRO_NAO_IMPLEMENTADO, "listar_inscricoes_periodo_menu");
+  // data_curso_usuario_index *buscar = busca_binaria(data_inicio, data_curso_usuario_idx, qtd_registros_inscricoes, sizeof(data_curso_usuario_index), qsort_data_idx, true, NULL);
+  // if(!buscar){
+  //   printf(AVISO_NENHUM_REGISTRO_ENCONTRADO);
+  //   return;
+  // }
+  // do
+  // {
+  //   exibir_inscricao(buscar.);
+  //   buscar++;
+  // } while (strcmp(buscar->data, data_fim) <= 0);
+  
+  //printf(ERRO_NAO_IMPLEMENTADO, "listar_inscricoes_periodo_menu");
 }
 
 /* Liberar espaço */
@@ -1743,51 +1774,53 @@ int qsort_inscricoes_idx(const void *a, const void *b) {
 int qsort_titulo_idx(const void *a, const void *b) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
   return strcmp(((titulos_index *)a)->id_curso, ((titulos_index *)b)->id_curso);
-  printf(ERRO_NAO_IMPLEMENTADO, "qsort_titulo_idx");
+  //printf(ERRO_NAO_IMPLEMENTADO, "qsort_titulo_idx");
 }
 
 /* Funções de comparação entre chaves do índice data_curso_usuario_idx */
 int qsort_data_idx(const void *a, const void *b) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-  if (strcmp(((data_curso_usuario_index *)a)->data,
-             ((data_curso_usuario_index *)b)->data) < 0) {
-    if (strcmp(((data_curso_usuario_index *)a)->id_curso,
-               ((data_curso_usuario_index *)b)->id_curso) < 0) {
-      if (strcmp(((data_curso_usuario_index *)a)->id_usuario,
-                 ((data_curso_usuario_index *)b)->id_usuario) < 0) {
-        return -1;
-      } else {
-        return 1;
-      }
-      return 0;
-    } else {
-      return 1;
-    }
-  } else {
-    return 1;
-  }
+  int data_cronologica = strcmp(((data_curso_usuario_index *)a)->data, ((data_curso_usuario_index *)b)->data);
+  if(data_cronologica > 0)
+    return 0;
+  else
+    return data_cronologica;
   // printf(ERRO_NAO_IMPLEMENTADO, "qsort_data_idx");
 }
 
 int qsort_data_curso_usuario_idx(const void *a, const void *b) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-  if (strcmp(((data_curso_usuario_index *)a)->id_curso,
-             ((data_curso_usuario_index *)b)->id_curso) < 0) {
-    if (strcmp(((data_curso_usuario_index *)a)->id_usuario,
-               ((data_curso_usuario_index *)b)->id_usuario) < 0) {
-      if (strcmp(((data_curso_usuario_index *)a)->data,
-                 ((data_curso_usuario_index *)b)->data) < 0) {
-        return -1;
-      } else {
-        return 1;
-      }
-      return 0;
-    } else {
-      return 1;
+  int ordem_data = strcmp(((data_curso_usuario_index *)a)->data,
+                          ((data_curso_usuario_index *)b)->data);
+  if(ordem_data == 0){// igual
+    int ordem_curso = strcmp(((data_curso_usuario_index *)a)->id_curso,
+                             ((data_curso_usuario_index *)b)->id_curso);
+    if(ordem_curso == 0){
+      return strcmp(((data_curso_usuario_index *)a)->id_usuario,
+                    ((data_curso_usuario_index *)b)->id_usuario);
+    }else{
+      return ordem_curso;
     }
-  } else {
-    return 1;
+  }else{
+    return ordem_data;
   }
+  // if (strcmp(((data_curso_usuario_index *)a)->id_curso,
+  //            ((data_curso_usuario_index *)b)->id_curso) < 0) {
+  //   if (strcmp(((data_curso_usuario_index *)a)->id_usuario,
+  //              ((data_curso_usuario_index *)b)->id_usuario) < 0) {
+  //     if (strcmp(((data_curso_usuario_index *)a)->data,
+  //                ((data_curso_usuario_index *)b)->data) < 0) {
+  //       return -1;
+  //     } else {
+  //       return 1;
+  //     }
+  //     return 0;
+  //   } else {
+  //     return 1;
+  //   }
+  // } else {
+  //   return 1;
+  // }
   // printf(ERRO_NAO_IMPLEMENTADO, "qsort_data_curso_usuario_idx");
 }
 
@@ -1805,13 +1838,11 @@ void inverted_list_insert(char *chave_secundaria, char *chave_primaria,
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
   char *p;
   strcpy(p, chave_secundaria);
-  char *token = strtok(p, "|");
-  while (token != NULL) {
     // checar se a categoria já existe e pegar a posição caso exista
     bool existe = false;
     int pos;
     for (int j = 0; j < t->qtd_registros_secundario; j++) {
-      if (strcmp(t->categorias_secundario_idx[j].chave_secundaria, token) ==
+      if (strcmp(t->categorias_secundario_idx[j].chave_secundaria, p) ==
           0) {
         existe = true;
         pos = j;
@@ -1823,7 +1854,7 @@ void inverted_list_insert(char *chave_secundaria, char *chave_primaria,
       // lido com a chave secundária
       strcpy(t->categorias_secundario_idx[t->qtd_registros_secundario]
                  .chave_secundaria,
-             token);
+             p);
       t->categorias_secundario_idx[t->qtd_registros_secundario]
           .primeiro_indice = t->qtd_registros_primario;
       t->qtd_registros_secundario++;
@@ -1848,8 +1879,7 @@ void inverted_list_insert(char *chave_secundaria, char *chave_primaria,
           chave_primaria);
       t->qtd_registros_primario++;
     }
-    token = strtok(NULL, "|");
-  }
+  
   qsort(t->categorias_secundario_idx, t->qtd_registros_secundario,
         sizeof(categorias_secundario_index), qsort_categorias_secundario_idx);
   // printf(ERRO_NAO_IMPLEMENTADO, "inverted_list_insert");
