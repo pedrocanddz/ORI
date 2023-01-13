@@ -1218,28 +1218,36 @@ Usuario recuperar_registro_usuario(int rrn) {
 Curso recuperar_registro_curso(int rrn) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
   Curso c;
-  char temp[TAM_REGISTRO_CURSO + 1], *p;
+  char temp[TAM_REGISTRO_CURSO + 1], *p, *token_categorias;
   strncpy(temp, ARQUIVO_CURSOS + (rrn * TAM_REGISTRO_CURSO),
           TAM_REGISTRO_CURSO);
   temp[TAM_REGISTRO_CURSO] = '\0';
 
-  p = strtok(temp, ';');
+  p = strtok(temp, ";");
   strcpy(c.id_curso, p);
-  p = strtok(NULL, ';');
+  p = strtok(NULL, ";");
   strcpy(c.titulo, p);
-  p = strtok(NULL, ';');
+  p = strtok(NULL, ";");
   strcpy(c.instituicao, p);
-  p = strtok(NULL, ';');
+  p = strtok(NULL, ";");
   strcpy(c.ministrante, p);
-  p = strtok(NULL, ';');
+  p = strtok(NULL, ";");
   strcpy(c.lancamento, p);
-  p = strtok(NULL, ';');
+  p = strtok(NULL, ";");
+
   strcpy(c.carga, p);
-  p = strtok(NULL, ';');
+  p = strtok(NULL, ";");
   c.valor = atof(p);
+  p = strtok(NULL, ";");
   // Aqui começa as categorias
-  p = strtok(NULL, ';');
-  strcpy(c.categorias, p);
+  token_categorias = strtok(p, "|");
+
+  for (int i = 0; i < QTD_MAX_CATEGORIAS; i++) {
+    if (token_categorias) {
+      strcpy(c.categorias[i], token_categorias);
+      token_categorias = strtok(NULL, "|");
+    }
+  }
 
   return c;
   // printf(ERRO_NAO_IMPLEMENTADO, "recuperar_registro_curso");
@@ -1251,20 +1259,20 @@ Inscricao recuperar_registro_inscricao(int rrn) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
   Inscricao i;
   char temp[TAM_REGISTRO_INSCRICAO + 1], *p;
-  strcpy(temp, ARQUIVO_INSCRICOES + (rrn * TAM_REGISTRO_INSCRICAO),
-         TAM_REGISTRO_INSCRICAO);
+  strncpy(temp, ARQUIVO_INSCRICOES + (rrn * TAM_REGISTRO_INSCRICAO),
+          TAM_REGISTRO_INSCRICAO);
   temp[TAM_REGISTRO_INSCRICAO] = '\0';
 
   p = temp;
-  strcpy(p, temp, 8);
+  strncpy(p, temp, 8);
   strcpy(i.id_curso, p);
-  strcpy(p, temp[8], 11);
+  strncpy(p, temp + 8, 11);
   strcpy(i.id_usuario, p);
-  strcpy(p, temp[19], 12);
+  strncpy(p, temp + 19, 12);
   strcpy(i.data_inscricao, p);
-  strcpy(p, temp[31], 1);
+  strncpy(p, temp + 31, 1);
   strcpy(i.status, p);
-  strcpy(p, temp[32], 12);
+  strncpy(p, temp + 32, 12);
   strcpy(i.data_atualizacao, p);
 
   return i;
@@ -1364,7 +1372,11 @@ void cadastrar_usuario_menu(char *id_usuario, char *nome, char *email,
   strcpy(new.nome, nome);
   strcpy(new.email, email);
   // tratar sem entrada de telefone
-  strcpy(new.telefone, telefone);
+  if (!telefone) {
+    strcpy(new.telefone, telefone);
+  } else {
+    strcpy(new.telefone, "***********");
+  }
   sprintf(0, "%013.2lf", new.saldo);
 
   // printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_usuario_menu");
@@ -1715,6 +1727,7 @@ int inverted_list_primary_search(
     int indice, int *indice_final, inverted_list *t) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
   int cursos = 0;
+  int indice_retornado = indice;
   while (t->categorias_primario_idx[indice].proximo_indice != -1) {
     strcpy(result[cursos], t->categorias_primario_idx[indice].chave_primaria);
     indice = t->categorias_primario_idx[indice].proximo_indice;
@@ -1767,7 +1780,7 @@ void *busca_binaria(const void *key, const void *base0, size_t nmemb,
       start = middle + 1;
     }
     if (exibir_caminho) {
-      printf("%d ", middle);
+      printf("%d ", (int)middle);
     }
   }
   return (void *)retorno_se_nao_encontrado;
