@@ -1379,66 +1379,220 @@ void cadastrar_usuario_menu(char *id_usuario, char *nome, char *email,
   }
   sprintf(0, "%013.2lf", new.saldo);
 
+    //checar se o id_usuario já existe
+    usuarios_index *koo = busca_binaria(id_usuario, usuarios_idx, sizeof(usuarios_index), qtd_registros_usuarios, qsort_usuarios_idx, false, NULL);
+    if(koo){
+        printf(ERRO_PK_REPETIDA, id_usuario);
+        return;
+    }
+
+    escrever_registro_usuario(new, qtd_registros_usuarios);
+    qtd_registros_usuarios++;
+    printf(SUCESSO);
   // printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_usuario_menu");
 }
 
 void cadastrar_telefone_menu(char *id_usuario, char *telefone) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-
-  printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_telefone_menu");
+    usuarios_index *koo = busca_binaria(id_usuario, usuarios_idx, sizeof(usuarios_index), qtd_registros_usuarios, qsort_usuarios_idx, false, NULL);
+    if(!koo){
+        printf(ERRO_REGISTRO_NAO_ENCONTRADO);
+        return;
+    }
+    int rrn = koo->rrn;
+    Usuario x = recuperar_registro_usuario(rrn);
+    strcpy(x.telefone, telefone);
+    escrever_registro_usuario(x, rrn);
+    printf(SUCESSO);
+  //printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_telefone_menu");
 }
 
 void remover_usuario_menu(char *id_usuario) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-  printf(ERRO_NAO_IMPLEMENTADO, "remover_usuario_menu");
+    usuarios_index *koo = busca_binaria(id_usuario, usuarios_idx, sizeof(usuarios_index), qtd_registros_usuarios, qsort_usuarios_idx, false, NULL);
+    if(!koo){
+        printf(ERRO_REGISTRO_NAO_ENCONTRADO);
+        return;
+    }
+    int rrn = koo->rrn;
+    Usuario x = recuperar_registro_usuario(rrn);
+    x.id_usuario[0] = "*";
+    x.id_usuario[1] = "|";
+    koo->rrn = -1;
+    escrever_registro_usuario(x, rrn);
+    printf(SUCESSO);
+ //printf(ERRO_NAO_IMPLEMENTADO, "remover_usuario_menu");
 }
 
 void cadastrar_curso_menu(char *titulo, char *instituicao, char *ministrante,
                           char *lancamento, int carga, double valor) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-  printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_curso_menu");
+    Curso c;
+    strcpy(c.titulo, titulo);
+    strcpy(c.instituicao, instituicao);
+    strcpy(c.ministrante, ministrante);
+    strcpy(c.lancamento, lancamento);
+    c.carga = carga;
+    c.valor = valor;
+    cursos_index *cursos = busca_binaria(titulo, cursos_idx, sizeof(cursos_index), qtd_registros_cursos, qsort_cursos_idx, false, NULL);
+    if(!cursos){
+        printf(ERRO_PK_REPETIDA);
+        return;
+    }
+    sprintf(c.id_curso, "%08d", qtd_registros_cursos);
+    escrever_registro_curso(c, qtd_registros_cursos);
+    qtd_registros_cursos++;
+  printf(SUCESSO);
 }
 
 void adicionar_saldo_menu(char *id_usuario, double valor) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-  printf(ERRO_NAO_IMPLEMENTADO, "adicionar_saldo_menu");
+  usuarios_index *user = busca_binaria(id_usuario, usuarios_idx, sizeof(usuarios_index), qtd_registros_usuarios, qsort_usuarios_idx, false, NULL);
+    if(!user){
+        printf(ERRO_REGISTRO_NAO_ENCONTRADO);
+        return;
+    }
+    if(valor <= 0){
+        printf(ERRO_VALOR_INVALIDO);
+        return;
+    }
+    int rrn = user->rrn;
+    Usuario x = recuperar_registro_usuario(rrn);
+    x.saldo += valor;
+    escrever_registro_usuario(x, rrn);
+    printf(SUCESSO);
+    //printf(ERRO_NAO_IMPLEMENTADO, "adicionar_saldo_menu");
 }
 
 void inscrever_menu(char *id_curso, char *id_usuario) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-  printf(ERRO_NAO_IMPLEMENTADO, "inscrever_menu");
+  cursos_index *c = busca_binaria(id_curso, cursos_idx, qtd_registros_cursos, sizeof(cursos_index), qsort_cursos_idx, false, NULL);
+    if(!c){
+        printf(ERRO_REGISTRO_NAO_ENCONTRADO);
+        return;
+    }
+    int rrn_curso = c->rrn;
+
+    usuarios_index *u = busca_binaria(id_usuario, usuarios_idx, qtd_registros_usuarios, sizeof(usuarios_index), qsort_usuarios_idx, false, NULL);
+    if(!u){
+        printf(ERRO_REGISTRO_NAO_ENCONTRADO);
+        return;
+    }
+    int rrn_usuario = u->rrn;
+    //incrição a buscar obs: busquei na internet sobre como buscar multiplos parametros pela mesma chave
+    inscricoes_index buscar;
+    strcpy(buscar.id_curso, id_curso);
+    strcpy(buscar.id_usuario, id_usuario);
+    inscricoes_index *i = busca_binaria(&buscar, inscricoes_idx, qtd_registros_inscricoes, sizeof(inscricoes_index), qsort_inscricoes_idx, false, NULL);
+    if(i){
+        printf(ERRO_PK_REPETIDA);
+        return;
+    }
+    
+    Curso curso = recuperar_registro_curso(rrn_curso);
+    Usuario user = recuperar_registro_usuario(rrn_usuario);
+
+    if(user.saldo < curso.valor){
+        printf(ERRO_SALDO_NAO_SUFICIENTE);
+        return;
+    }
+    char datetime[TAM_DATETIME];
+    current_datetime(datetime);
+    Inscricao inscricao;
+    strcpy(inscricao.id_curso, id_curso);
+    strcpy(inscricao.id_usuario, id_usuario);
+    strcpy(inscricao.data_inscricao, datetime);
+    strcpy(inscricao.data_atualizacao, datetime);
+    strcpy(inscricao.status, "A");
+    printf(SUCESSO);
+    escrever_registro_inscricao(inscricao, qtd_registros_inscricoes);
+    qtd_registros_inscricoes++;
+
 }
 
 void cadastrar_categoria_menu(char *titulo, char *categoria) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-  printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_categoria_menu");
+  cursos_index *c = busca_binaria(titulo, cursos_idx, qtd_registros_cursos, sizeof(cursos_index), qsort_cursos_idx, false, NULL);
+  if(!c){
+    printf(ERRO_REGISTRO_NAO_ENCONTRADO);
+    return;
+  }
+    int rrn = c->rrn;
+    Curso curso = recuperar_registro_curso(rrn);
+    for(int i = 0; i < QTD_MAX_CATEGORIAS; i++){
+        if(strcmp(curso.categorias[i], categoria) == 0){
+            printf(ERRO_CATEGORIA_REPETIDA);
+            return;
+        }else if(strcmp(curso.categorias[i], "") == 0){
+            strcpy(curso.categorias[i], categoria);
+            escrever_registro_curso(curso, rrn);
+            printf(SUCESSO);
+            return;
+        }
+    }
 }
 
 void atualizar_status_inscricoes_menu(char *id_usuario, char *titulo,
                                       char status) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-  printf(ERRO_NAO_IMPLEMENTADO, "atualizar_status_inscricoes_menu");
+    Inscricao buscar;
+
+    strcpy(buscar.id_usuario, id_usuario);
+    strcpy(buscar.id_curso, titulo);
+    inscricoes_index *i = busca_binaria(&buscar, inscricoes_idx, qtd_registros_inscricoes, sizeof(inscricoes_index), qsort_inscricoes_idx, false, NULL);
+    if(!i){
+        printf(ERRO_REGISTRO_NAO_ENCONTRADO);
+        return;
+    }
+    int rrn = i->rrn;
+    Inscricao inscricao = recuperar_registro_inscricao(rrn);
+    strcpy(inscricao.status, status);
+    escrever_registro_inscricao(inscricao, rrn);
+    printf(SUCESSO);
+  //printf(ERRO_NAO_IMPLEMENTADO, "atualizar_status_inscricoes_menu");
 }
 
 /* Busca */
 void buscar_usuario_id_menu(char *id_usuario) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-  printf(ERRO_NAO_IMPLEMENTADO, "buscar_usuario_id_menu");
+  usuarios_index *buscar = busca_binaria(id_usuario, usuarios_idx, qtd_registros_usuarios, sizeof(usuarios_index), qsort_usuarios_idx, true, NULL);
+  if(!buscar){
+    printf(ERRO_REGISTRO_NAO_ENCONTRADO);
+    return;
+  }
+  exibir_usuario(buscar->rrn);
+  
+  //printf(ERRO_NAO_IMPLEMENTADO, "buscar_usuario_id_menu");
 }
 
 void buscar_curso_id_menu(char *id_curso) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+    cursos_index *buscar = busca_binaria(id_curso, cursos_idx, qtd_registros_cursos, sizeof(cursos_index), qsort_cursos_idx, true, NULL);
+    if(!buscar){
+        printf(ERRO_REGISTRO_NAO_ENCONTRADO);
+        return;
+    }
+    exibir_curso(buscar->rrn);
+
   printf(ERRO_NAO_IMPLEMENTADO, "buscar_curso_id_menu");
 }
 
 void buscar_curso_titulo_menu(char *titulo) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+  
+    cursos_index *buscar = busca_binaria(titulo, cursos_idx, qtd_registros_cursos, sizeof(cursos_index), qsort_cursos_idx, false, NULL);
+    if(!buscar){
+        printf(ERRO_REGISTRO_NAO_ENCONTRADO);
+        return;
+    }
+    exibir_curso(buscar->rrn);
   printf(ERRO_NAO_IMPLEMENTADO, "buscar_curso_titulo_menu");
 }
 
 /* Listagem */
 void listar_usuarios_id_menu() {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+  
   printf(ERRO_NAO_IMPLEMENTADO, "listar_usuarios_id_menu");
 }
 
@@ -1571,16 +1725,10 @@ int qsort_cursos_idx(const void *a, const void *b) {
 int qsort_inscricoes_idx(const void *a, const void *b) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
 
-  if (strcmp(((inscricoes_index *)a)->id_curso,
-             ((inscricoes_index *)b)->id_curso) > 0) {
-    return 1;
-  } else if (strcmp(((inscricoes_index *)a)->id_usuario,
-                    ((inscricoes_index *)b)->id_usuario) < 0) {
-    return -1;
-  } else {
-    return 1;
-  }
-  return 0; // caso nada passe
+  if(strcmp(((inscricoes_index *)a)->id_curso, ((inscricoes_index *)b)->id_curso) == 0)
+    return strcmp(((inscricoes_index *)a)->id_usuario, ((inscricoes_index *)b)->id_usuario);
+  else
+    return strcmp(((inscricoes_index *)a)->id_curso, ((inscricoes_index *)b)->id_curso);
   // printf(ERRO_NAO_IMPLEMENTADO, "qsort_inscricoes_idx");
 }
 
