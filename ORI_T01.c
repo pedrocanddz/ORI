@@ -1405,8 +1405,8 @@ void cadastrar_usuario_menu(char *id_usuario, char *nome, char *email,
 void cadastrar_telefone_menu(char *id_usuario, char *telefone) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
   usuarios_index *koo =
-      busca_binaria(id_usuario, usuarios_idx, sizeof(usuarios_index),
-                    qtd_registros_usuarios, qsort_usuarios_idx, false, NULL);
+      busca_binaria(id_usuario, usuarios_idx, 
+                    qtd_registros_usuarios,sizeof(usuarios_index), qsort_usuarios_idx, false, NULL);
   if (!koo) {
     printf(ERRO_REGISTRO_NAO_ENCONTRADO);
     return;
@@ -1422,8 +1422,8 @@ void cadastrar_telefone_menu(char *id_usuario, char *telefone) {
 void remover_usuario_menu(char *id_usuario) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
   usuarios_index *koo =
-      busca_binaria(id_usuario, usuarios_idx, sizeof(usuarios_index),
-                    qtd_registros_usuarios, qsort_usuarios_idx, false, NULL);
+      busca_binaria(id_usuario, usuarios_idx, 
+                    qtd_registros_usuarios,sizeof(usuarios_index), qsort_usuarios_idx, false, NULL);
   if (!koo) {
     printf(ERRO_REGISTRO_NAO_ENCONTRADO);
     return;
@@ -1449,8 +1449,8 @@ void cadastrar_curso_menu(char *titulo, char *instituicao, char *ministrante,
   c.carga = carga;
   c.valor = valor;
   cursos_index *cursos =
-      busca_binaria(titulo, cursos_idx, sizeof(cursos_index),
-                    qtd_registros_cursos, qsort_cursos_idx, false, NULL);
+      busca_binaria(titulo, cursos_idx, 
+                    qtd_registros_cursos,sizeof(cursos_index), qsort_cursos_idx, false, NULL);
   if (!cursos) {
     printf(ERRO_PK_REPETIDA);
     return;
