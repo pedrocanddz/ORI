@@ -1296,6 +1296,7 @@ void escrever_registro_inscricao(Inscricao c, int rrn) {
   strncpy(ARQUIVO_INSCRICOES + rrn * TAM_REGISTRO_INSCRICAO, temp,
           TAM_REGISTRO_INSCRICAO);
   ARQUIVO_INSCRICOES[qtd_registros_inscricoes * TAM_REGISTRO_INSCRICAO] = '\0';
+  printf("%s\n", ARQUIVO_INSCRICOES);
 }
  
 /* Funções principais */
@@ -1425,6 +1426,12 @@ void adicionar_saldo_menu(char *id_usuario, double valor) {
  
 void inscrever_menu(char *id_curso, char *id_usuario) {
   /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+  // printf("%s\n", ARQUIVO_CURSOS);
+  inscricoes_index igual;
+  strcpy(igual.id_curso, id_curso);
+  strcpy(igual.id_usuario, id_usuario);
+  // printf("%s", ARQUIVO_CURSOS);
+  // printf("%d\n", strcmp(id_curso, cursos_idx[0].id_curso));
   cursos_index *c =
       busca_binaria(id_curso, cursos_idx, qtd_registros_cursos,
                     sizeof(cursos_index), qsort_cursos_idx, false, 0);
