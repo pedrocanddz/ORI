@@ -5,10 +5,10 @@
  *
  * Trabalho 02 - Árvores-B
  *
- * RA: 
- * Aluno: 
+ * RA:
+ * Aluno:
  * ========================================================================== */
- 
+
 /* Bibliotecas */
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,9 +16,13 @@
 #include <time.h>
 #include <ctype.h>
 #include <string.h>
- 
-typedef enum {false, true} bool;
- 
+
+typedef enum
+{
+    false,
+    true
+} bool;
+
 /* Tamanho dos campos dos registros */
 /* Campos de tamanho fixo */
 #define TAM_DATE 9
@@ -29,7 +33,7 @@ typedef enum {false, true} bool;
 #define TAM_ID_USUARIO 12
 #define TAM_TELEFONE 12
 #define QTD_MAX_CATEGORIAS 3
- 
+
 /* Campos de tamanho variável (tamanho máximo) */
 #define TAM_MAX_NOME 45
 #define TAM_MAX_TITULO 52
@@ -37,15 +41,15 @@ typedef enum {false, true} bool;
 #define TAM_MAX_MINISTRANTE 51
 #define TAM_MAX_EMAIL 45
 #define TAM_MAX_CATEGORIA 21
- 
+
 #define MAX_REGISTROS 1000
-#define TAM_REGISTRO_USUARIO (TAM_ID_USUARIO+TAM_MAX_NOME+TAM_MAX_EMAIL+TAM_FLOAT_NUMBER+TAM_TELEFONE)
-#define TAM_REGISTRO_CURSO (TAM_ID_CURSO+TAM_MAX_TITULO+TAM_MAX_INSTITUICAO+TAM_MAX_MINISTRANTE+TAM_DATE+TAM_INT_NUMBER+TAM_FLOAT_NUMBER+QTD_MAX_CATEGORIAS*TAM_MAX_CATEGORIA+1)
-#define TAM_REGISTRO_INSCRICAO (TAM_ID_CURSO+TAM_ID_USUARIO+TAM_DATETIME+1+TAM_DATETIME-4)
+#define TAM_REGISTRO_USUARIO (TAM_ID_USUARIO + TAM_MAX_NOME + TAM_MAX_EMAIL + TAM_FLOAT_NUMBER + TAM_TELEFONE)
+#define TAM_REGISTRO_CURSO (TAM_ID_CURSO + TAM_MAX_TITULO + TAM_MAX_INSTITUICAO + TAM_MAX_MINISTRANTE + TAM_DATE + TAM_INT_NUMBER + TAM_FLOAT_NUMBER + QTD_MAX_CATEGORIAS * TAM_MAX_CATEGORIA + 1)
+#define TAM_REGISTRO_INSCRICAO (TAM_ID_CURSO + TAM_ID_USUARIO + TAM_DATETIME + 1 + TAM_DATETIME - 4)
 #define TAM_ARQUIVO_USUARIOS (TAM_REGISTRO_USUARIO * MAX_REGISTROS + 1)
 #define TAM_ARQUIVO_CURSOS (TAM_REGISTRO_CURSO * MAX_REGISTROS + 1)
 #define TAM_ARQUIVO_INSCRICOES (TAM_REGISTRO_INSCRICAO * MAX_REGISTROS + 1)
- 
+
 #define TAM_RRN_REGISTRO 4
 #define TAM_CHAVE_USUARIOS_IDX (TAM_ID_USUARIO + TAM_RRN_REGISTRO - 1)
 #define TAM_CHAVE_CURSOS_IDX (TAM_ID_CURSO + TAM_RRN_REGISTRO - 1)
@@ -54,42 +58,44 @@ typedef enum {false, true} bool;
 #define TAM_CHAVE_DATA_CURSO_USUARIO_IDX (TAM_DATETIME + TAM_ID_CURSO + TAM_ID_USUARIO - 3)
 #define TAM_CHAVE_CATEGORIAS_SECUNDARIO_IDX (TAM_MAX_CATEGORIA - 1)
 #define TAM_CHAVE_CATEGORIAS_PRIMARIO_IDX (TAM_ID_CURSO - 1)
- 
+
 #define TAM_ARQUIVO_USUARIOS_IDX (1000 * MAX_REGISTROS + 1)
 #define TAM_ARQUIVO_CURSOS_IDX (1000 * MAX_REGISTROS + 1)
 #define TAM_ARQUIVO_INSCRICOES_IDX (1000 * MAX_REGISTROS + 1)
 #define TAM_ARQUIVO_TITULO_IDX (1000 * MAX_REGISTROS + 1)
 #define TAM_ARQUIVO_DATA_CURSO_USUARIO_IDX (1000 * MAX_REGISTROS + 1)
 #define TAM_ARQUIVO_CATEGORIAS_IDX (1000 * MAX_REGISTROS + 1)
- 
+
 /* Mensagens padrões */
-#define SUCESSO                          "OK\n"
-#define RRN_NOS                          "Nos percorridos:"
-#define RRN_REGS_PRIMARIOS               "Registros primários percorridos:"
-#define RRN_REGS_SECUNDARIOS             "Registros secundários percorridos:"
-#define INDICE_CRIADO                    "Indice %s criado com sucesso!\n"
+#define SUCESSO "OK\n"
+#define RRN_NOS "Nos percorridos:"
+#define RRN_REGS_PRIMARIOS "Registros primários percorridos:"
+#define RRN_REGS_SECUNDARIOS "Registros secundários percorridos:"
+#define INDICE_CRIADO "Indice %s criado com sucesso!\n"
 #define AVISO_NENHUM_REGISTRO_ENCONTRADO "AVISO: Nenhum registro encontrado\n"
-#define ERRO_OPCAO_INVALIDA              "ERRO: Opcao invalida\n"
-#define ERRO_MEMORIA_INSUFICIENTE        "ERRO: Memoria insuficiente\n"
-#define ERRO_PK_REPETIDA                 "ERRO: Ja existe um registro com a chave %s\n"
-#define ERRO_REGISTRO_NAO_ENCONTRADO     "ERRO: Registro nao encontrado\n"
-#define ERRO_SALDO_NAO_SUFICIENTE        "ERRO: Saldo insuficiente\n"
-#define ERRO_CATEGORIA_REPETIDA          "ERRO: O curso %s ja possui a categoria %s\n"
-#define ERRO_VALOR_INVALIDO              "ERRO: Valor invalido\n"
-#define ERRO_ARQUIVO_VAZIO               "ERRO: Arquivo vazio\n"
-#define ERRO_NAO_IMPLEMENTADO            "ERRO: Funcao %s nao implementada\n"
- 
+#define ERRO_OPCAO_INVALIDA "ERRO: Opcao invalida\n"
+#define ERRO_MEMORIA_INSUFICIENTE "ERRO: Memoria insuficiente\n"
+#define ERRO_PK_REPETIDA "ERRO: Ja existe um registro com a chave %s\n"
+#define ERRO_REGISTRO_NAO_ENCONTRADO "ERRO: Registro nao encontrado\n"
+#define ERRO_SALDO_NAO_SUFICIENTE "ERRO: Saldo insuficiente\n"
+#define ERRO_CATEGORIA_REPETIDA "ERRO: O curso %s ja possui a categoria %s\n"
+#define ERRO_VALOR_INVALIDO "ERRO: Valor invalido\n"
+#define ERRO_ARQUIVO_VAZIO "ERRO: Arquivo vazio\n"
+#define ERRO_NAO_IMPLEMENTADO "ERRO: Funcao %s nao implementada\n"
+
 /* Registro de Usuario */
-typedef struct {
+typedef struct
+{
     char id_usuario[TAM_ID_USUARIO];
     char nome[TAM_MAX_NOME];
     char email[TAM_MAX_EMAIL];
     char telefone[TAM_TELEFONE];
     double saldo;
 } Usuario;
- 
+
 /* Registro de Curso */
-typedef struct {
+typedef struct
+{
     char id_curso[TAM_ID_CURSO];
     char titulo[TAM_MAX_TITULO];
     char instituicao[TAM_MAX_INSTITUICAO];
@@ -99,46 +105,49 @@ typedef struct {
     double valor;
     char categorias[QTD_MAX_CATEGORIAS][TAM_MAX_CATEGORIA];
 } Curso;
- 
+
 /* Registro de Inscricao */
-typedef struct {
+typedef struct
+{
     char id_curso[TAM_ID_CURSO];
     char id_usuario[TAM_ID_USUARIO];
     char data_inscricao[TAM_DATETIME];
     char status;
-    char data_atualizacao[TAM_DATETIME];		
+    char data_atualizacao[TAM_DATETIME];
 } Inscricao;
- 
- 
+
 /*----- Registros dos índices -----*/
- 
+
 /* Struct para índice de lista invertida */
-typedef struct {
-    char* chave;
+typedef struct
+{
+    char *chave;
     int proximo_indice;
 } inverted_list_node;
 
 /* Struct para um nó de Árvore-B */
-typedef struct {
+typedef struct
+{
     int this_rrn;
     int qtd_chaves;
     char **chaves; // ponteiro para o começo do campo de chaves no arquivo de índice respectivo
     bool folha;
     int *filhos; // vetor de int para o RRN dos nós filhos (DEVE SER DESALOCADO APÓS O USO!!!)
 } btree_node;
- 
+
 /* Variáveis globais */
 /* Arquivos de dados */
 char ARQUIVO_USUARIOS[TAM_ARQUIVO_USUARIOS];
 char ARQUIVO_CURSOS[TAM_ARQUIVO_CURSOS];
 char ARQUIVO_INSCRICOES[TAM_ARQUIVO_INSCRICOES];
- 
+
 /* Ordem das Árvores-B */
 int btree_order = 3; // valor padrão
 
 /* Índices */
 /* Struct para os parâmetros de uma lista invertida */
-typedef struct {
+typedef struct
+{
     // Ponteiro para o arquivo de índice secundário
     char *arquivo_secundario;
 
@@ -163,7 +172,8 @@ typedef struct {
 } inverted_list;
 
 /* Struct para os parâmetros de uma Árvore-B */
-typedef struct {
+typedef struct
+{
     // RRN da raiz
     int rrn_raiz;
 
@@ -181,7 +191,8 @@ typedef struct {
     int (*compar)(const void *key, const void *elem);
 } btree;
 
-typedef struct {
+typedef struct
+{
     char chave_promovida[TAM_CHAVE_TITULO_IDX + 1]; // TAM_CHAVE_TITULO_IDX é a maior chave possível
     int filho_direito;
 } promovido_aux;
@@ -194,7 +205,7 @@ char ARQUIVO_TITULO_IDX[TAM_ARQUIVO_TITULO_IDX];
 char ARQUIVO_DATA_CURSO_USUARIO_IDX[TAM_ARQUIVO_DATA_CURSO_USUARIO_IDX];
 char ARQUIVO_CATEGORIAS_SECUNDARIO_IDX[TAM_ARQUIVO_CATEGORIAS_IDX];
 char ARQUIVO_CATEGORIAS_PRIMARIO_IDX[TAM_ARQUIVO_CATEGORIAS_IDX];
- 
+
 /* Comparam a chave (key) com cada elemento do índice (elem).
  * Funções auxiliares para o buscar e inserir chaves em Árvores-B.
  * Note que, desta vez, as funções comparam chaves no formato de strings, não structs.
@@ -258,29 +269,31 @@ inverted_list categorias_idx = {
     .tam_chave_primaria = TAM_CHAVE_CATEGORIAS_PRIMARIO_IDX,
     .compar = order_categorias_idx,
 };
- 
+
 /* Contadores */
 unsigned qtd_registros_usuarios = 0;
 unsigned qtd_registros_cursos = 0;
 unsigned qtd_registros_inscricoes = 0;
- 
+
 /* Funções de geração determinística de números pseudo-aleatórios */
 uint64_t prng_seed;
- 
-void prng_srand(uint64_t value) {
+
+void prng_srand(uint64_t value)
+{
     prng_seed = value;
 }
- 
-uint64_t prng_rand() {
+
+uint64_t prng_rand()
+{
     // https://en.wikipedia.org/wiki/Xorshift#xorshift*
     uint64_t x = prng_seed; // O estado deve ser iniciado com um valor diferente de 0
-    x ^= x >> 12; // a
-    x ^= x << 25; // b
-    x ^= x >> 27; // c
+    x ^= x >> 12;           // a
+    x ^= x << 25;           // b
+    x ^= x >> 27;           // c
     prng_seed = x;
     return x * UINT64_C(0x2545F4914F6CDD1D);
 }
- 
+
 /**
  * Gera um <a href="https://en.wikipedia.org/wiki/Universally_unique_identifier">UUID Version-4 Variant-1</a>
  * (<i>string</i> aleatória) de 36 caracteres utilizando o gerador de números pseudo-aleatórios
@@ -297,53 +310,56 @@ uint64_t prng_rand() {
  * @param buffer String de tamanho 37 no qual será escrito
  * o UUID. É terminado pelo caractere <code>\0</code>.
  */
-void new_uuid(char buffer[37]) {
+void new_uuid(char buffer[37])
+{
     uint64_t r1 = prng_rand();
     uint64_t r2 = prng_rand();
- 
+
     sprintf(buffer, "%08x-%04x-%04lx-%04lx-%012lx", (uint32_t)(r1 >> 32), (uint16_t)(r1 >> 16), 0x4000 | (r1 & 0x0fff), 0x8000 | (r2 & 0x3fff), r2 >> 16);
 }
- 
+
 /* Funções de manipulação de data */
 time_t epoch;
 
-#define YEAR0                   1900
-#define EPOCH_YR                1970
-#define SECS_DAY                (24L * 60L * 60L)
-#define LEAPYEAR(year)          (!((year) % 4) && (((year) % 100) || !((year) % 400)))
-#define YEARSIZE(year)          (LEAPYEAR(year) ? 366 : 365)
+#define YEAR0 1900
+#define EPOCH_YR 1970
+#define SECS_DAY (24L * 60L * 60L)
+#define LEAPYEAR(year) (!((year) % 4) && (((year) % 100) || !((year) % 400)))
+#define YEARSIZE(year) (LEAPYEAR(year) ? 366 : 365)
 
-#define TIME_MAX                2147483647L
+#define TIME_MAX 2147483647L
 
-long _dstbias = 0;                  // Offset for Daylight Saving Time
-long _timezone = 0;                 // Difference in seconds between GMT and local time
+long _dstbias = 0;  // Offset for Daylight Saving Time
+long _timezone = 0; // Difference in seconds between GMT and local time
 
 const int _ytab[2][12] = {
     {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
-    {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
-};
+    {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}};
 
-struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
+struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf)
+{
     // based on http://www.jbox.dk/sanos/source/lib/time.c.html
     time_t time = *timer;
     unsigned long dayclock, dayno;
     int year = EPOCH_YR;
 
-    dayclock = (unsigned long) time % SECS_DAY;
-    dayno = (unsigned long) time / SECS_DAY;
+    dayclock = (unsigned long)time % SECS_DAY;
+    dayno = (unsigned long)time / SECS_DAY;
 
     tmbuf->tm_sec = dayclock % 60;
     tmbuf->tm_min = (dayclock % 3600) / 60;
     tmbuf->tm_hour = dayclock / 3600;
     tmbuf->tm_wday = (dayno + 4) % 7; // Day 0 was a thursday
-    while (dayno >= (unsigned long) YEARSIZE(year)) {
+    while (dayno >= (unsigned long)YEARSIZE(year))
+    {
         dayno -= YEARSIZE(year);
         year++;
     }
     tmbuf->tm_year = year - YEAR0;
     tmbuf->tm_yday = dayno;
     tmbuf->tm_mon = 0;
-    while (dayno >= (unsigned long) _ytab[LEAPYEAR(year)][tmbuf->tm_mon]) {
+    while (dayno >= (unsigned long)_ytab[LEAPYEAR(year)][tmbuf->tm_mon])
+    {
         dayno -= _ytab[LEAPYEAR(year)][tmbuf->tm_mon];
         tmbuf->tm_mon++;
     }
@@ -352,7 +368,8 @@ struct tm *gmtime_r(const time_t *timer, struct tm *tmbuf) {
     return tmbuf;
 }
 
-time_t mktime(struct tm *tmbuf) {
+time_t mktime(struct tm *tmbuf)
+{
     // based on http://www.jbox.dk/sanos/source/lib/time.c.html
     long day, year;
     int tm_year;
@@ -363,48 +380,57 @@ time_t mktime(struct tm *tmbuf) {
 
     tmbuf->tm_min += tmbuf->tm_sec / 60;
     tmbuf->tm_sec %= 60;
-    if (tmbuf->tm_sec < 0) {
+    if (tmbuf->tm_sec < 0)
+    {
         tmbuf->tm_sec += 60;
         tmbuf->tm_min--;
     }
     tmbuf->tm_hour += tmbuf->tm_min / 60;
     tmbuf->tm_min = tmbuf->tm_min % 60;
-    if (tmbuf->tm_min < 0) {
+    if (tmbuf->tm_min < 0)
+    {
         tmbuf->tm_min += 60;
         tmbuf->tm_hour--;
     }
     day = tmbuf->tm_hour / 24;
-    tmbuf->tm_hour= tmbuf->tm_hour % 24;
-    if (tmbuf->tm_hour < 0) {
+    tmbuf->tm_hour = tmbuf->tm_hour % 24;
+    if (tmbuf->tm_hour < 0)
+    {
         tmbuf->tm_hour += 24;
         day--;
     }
     tmbuf->tm_year += tmbuf->tm_mon / 12;
     tmbuf->tm_mon %= 12;
-    if (tmbuf->tm_mon < 0) {
+    if (tmbuf->tm_mon < 0)
+    {
         tmbuf->tm_mon += 12;
         tmbuf->tm_year--;
     }
     day += (tmbuf->tm_mday - 1);
-    while (day < 0) {
-        if(--tmbuf->tm_mon < 0) {
+    while (day < 0)
+    {
+        if (--tmbuf->tm_mon < 0)
+        {
             tmbuf->tm_year--;
             tmbuf->tm_mon = 11;
         }
         day += _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon];
     }
-    while (day >= _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon]) {
+    while (day >= _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon])
+    {
         day -= _ytab[LEAPYEAR(YEAR0 + tmbuf->tm_year)][tmbuf->tm_mon];
-        if (++(tmbuf->tm_mon) == 12) {
+        if (++(tmbuf->tm_mon) == 12)
+        {
             tmbuf->tm_mon = 0;
             tmbuf->tm_year++;
         }
     }
     tmbuf->tm_mday = day + 1;
     year = EPOCH_YR;
-    if (tmbuf->tm_year < year - YEAR0) return (time_t) -1;
+    if (tmbuf->tm_year < year - YEAR0)
+        return (time_t)-1;
     seconds = 0;
-    day = 0;                      // Means days since day 0 now
+    day = 0; // Means days since day 0 now
     overflow = 0;
 
     // Assume that when day becomes negative, there will certainly
@@ -414,57 +440,71 @@ time_t mktime(struct tm *tmbuf) {
     // The code only works when year (1970) is not a leapyear.
     tm_year = tmbuf->tm_year + YEAR0;
 
-    if (TIME_MAX / 365 < tm_year - year) overflow++;
+    if (TIME_MAX / 365 < tm_year - year)
+        overflow++;
     day = (tm_year - year) * 365;
-    if (TIME_MAX - day < (tm_year - year) / 4 + 1) overflow++;
+    if (TIME_MAX - day < (tm_year - year) / 4 + 1)
+        overflow++;
     day += (tm_year - year) / 4 + ((tm_year % 4) && tm_year % 4 < year % 4);
     day -= (tm_year - year) / 100 + ((tm_year % 100) && tm_year % 100 < year % 100);
     day += (tm_year - year) / 400 + ((tm_year % 400) && tm_year % 400 < year % 400);
 
     yday = month = 0;
-    while (month < tmbuf->tm_mon) {
+    while (month < tmbuf->tm_mon)
+    {
         yday += _ytab[LEAPYEAR(tm_year)][month];
         month++;
     }
     yday += (tmbuf->tm_mday - 1);
-    if (day + yday < 0) overflow++;
+    if (day + yday < 0)
+        overflow++;
     day += yday;
 
     tmbuf->tm_yday = yday;
-    tmbuf->tm_wday = (day + 4) % 7;               // Day 0 was thursday (4)
+    tmbuf->tm_wday = (day + 4) % 7; // Day 0 was thursday (4)
 
     seconds = ((tmbuf->tm_hour * 60L) + tmbuf->tm_min) * 60L + tmbuf->tm_sec;
 
-    if ((TIME_MAX - seconds) / SECS_DAY < day) overflow++;
+    if ((TIME_MAX - seconds) / SECS_DAY < day)
+        overflow++;
     seconds += day * SECS_DAY;
 
     // Now adjust according to timezone and daylight saving time
-    if (((_timezone > 0) && (TIME_MAX - _timezone < seconds)) || 
-        ((_timezone < 0) && (seconds < -_timezone))) {
+    if (((_timezone > 0) && (TIME_MAX - _timezone < seconds)) ||
+        ((_timezone < 0) && (seconds < -_timezone)))
+    {
         overflow++;
     }
     seconds += _timezone;
 
-    if (tmbuf->tm_isdst) {
+    if (tmbuf->tm_isdst)
+    {
         dst = _dstbias;
-    } else {
+    }
+    else
+    {
         dst = 0;
     }
 
-    if (dst > seconds) overflow++;        // dst is always non-negative
+    if (dst > seconds)
+        overflow++; // dst is always non-negative
     seconds -= dst;
 
-    if (overflow) return (time_t) -1;
+    if (overflow)
+        return (time_t)-1;
 
-    if ((time_t) seconds != seconds) return (time_t) -1;
-    return (time_t) seconds;
+    if ((time_t)seconds != seconds)
+        return (time_t)-1;
+    return (time_t)seconds;
 }
 
-bool set_time(char *date) {
+bool set_time(char *date)
+{
     // http://www.cplusplus.com/reference/ctime/mktime/
     struct tm tm_;
 
-    if (strlen(date) == TAM_DATETIME-1 && sscanf(date, "%4d%2d%2d%2d%2d", &tm_.tm_year, &tm_.tm_mon, &tm_.tm_mday, &tm_.tm_hour, &tm_.tm_min) == 5) {
+    if (strlen(date) == TAM_DATETIME - 1 && sscanf(date, "%4d%2d%2d%2d%2d", &tm_.tm_year, &tm_.tm_mon, &tm_.tm_mday, &tm_.tm_hour, &tm_.tm_min) == 5)
+    {
         tm_.tm_year -= 1900;
         tm_.tm_mon -= 1;
         tm_.tm_sec = 0;
@@ -474,8 +514,9 @@ bool set_time(char *date) {
     }
     return false;
 }
- 
-void tick_time() {
+
+void tick_time()
+{
     epoch += prng_rand() % 864000; // 10 dias
 }
 
@@ -493,7 +534,8 @@ void tick_time() {
  * @param buffer String de tamanho <code>TAM_DATE</code> no qual será escrita
  * a <i>timestamp</i>. É terminado pelo caractere <code>\0</code>.
  */
-void current_date(char buffer[TAM_DATE]) {
+void current_date(char buffer[TAM_DATE])
+{
     // http://www.cplusplus.com/reference/ctime/strftime/
     // http://www.cplusplus.com/reference/ctime/gmtime/
     // AAAA MM DD
@@ -502,7 +544,7 @@ void current_date(char buffer[TAM_DATE]) {
     if (gmtime_r(&epoch, &tm_) != NULL)
         strftime(buffer, TAM_DATE, "%Y%m%d", &tm_);
 }
- 
+
 /**
  * Escreve a <i>data</i> e a <i>hora</i> atual no formato <code>AAAAMMDDHHMM</code> em uma <i>string</i>
  * fornecida como parâmetro.<br />
@@ -517,7 +559,8 @@ void current_date(char buffer[TAM_DATE]) {
  * @param buffer String de tamanho <code>TAM_DATETIME</code> no qual será escrita
  * a <i>timestamp</i>. É terminado pelo caractere <code>\0</code>.
  */
-void current_datetime(char buffer[TAM_DATETIME]) {
+void current_datetime(char buffer[TAM_DATETIME])
+{
     // http://www.cplusplus.com/reference/ctime/strftime/
     // http://www.cplusplus.com/reference/ctime/gmtime/
     // AAAA MM DD HH MM
@@ -528,31 +571,33 @@ void current_datetime(char buffer[TAM_DATETIME]) {
 }
 
 /* Remove comentários (--) e caracteres whitespace do começo e fim de uma string */
-void clear_input(char *str) {
+void clear_input(char *str)
+{
     char *ptr = str;
     int len = 0;
- 
-    for (; ptr[len]; ++len) {
-        if (strncmp(&ptr[len], "--", 2) == 0) {
+
+    for (; ptr[len]; ++len)
+    {
+        if (strncmp(&ptr[len], "--", 2) == 0)
+        {
             ptr[len] = '\0';
             break;
         }
     }
- 
-    while(len-1 > 0 && isspace(ptr[len-1]))
+
+    while (len - 1 > 0 && isspace(ptr[len - 1]))
         ptr[--len] = '\0';
- 
-    while(*ptr && isspace(*ptr))
+
+    while (*ptr && isspace(*ptr))
         ++ptr, --len;
- 
+
     memmove(str, ptr, len + 1);
 }
- 
- 
+
 /* ==========================================================================
  * ========================= PROTÓTIPOS DAS FUNÇÕES =========================
  * ========================================================================== */
- 
+
 /* Cria o índice respectivo */
 void criar_usuarios_idx();
 void criar_cursos_idx();
@@ -560,12 +605,12 @@ void criar_inscricoes_idx();
 void criar_titulo_idx();
 void criar_data_curso_usuario_idx();
 void criar_categorias_idx();
- 
+
 /* Exibe um registro com base no RRN */
 bool exibir_usuario(int rrn);
 bool exibir_curso(int rrn);
 bool exibir_inscricao(int rrn);
- 
+
 /* Exibe um registro com base na chave de um btree_node */
 bool exibir_btree_usuario(char *chave);
 bool exibir_btree_curso(char *chave);
@@ -578,51 +623,51 @@ bool exibir_btree_data_curso_usuario(char *chave);
 Usuario recuperar_registro_usuario(int rrn);
 Curso recuperar_registro_curso(int rrn);
 Inscricao recuperar_registro_inscricao(int rrn);
- 
+
 /* Escreve em seu respectivo arquivo na posição informada (RRN) */
 void escrever_registro_usuario(Usuario u, int rrn);
 void escrever_registro_curso(Curso j, int rrn);
 void escrever_registro_inscricao(Inscricao c, int rrn);
- 
+
 /* Funções principais */
-void cadastrar_usuario_menu(char* id_usuario, char* nome, char* email, char* telefone);
-void cadastrar_telefone_menu(char* id_usuario, char* telefone);
+void cadastrar_usuario_menu(char *id_usuario, char *nome, char *email, char *telefone);
+void cadastrar_telefone_menu(char *id_usuario, char *telefone);
 void remover_usuario_menu(char *id_usuario);
-void cadastrar_curso_menu(char* titulo, char* instituicao, char* ministrante, char* lancamento, int carga, double valor);
-void adicionar_saldo_menu(char* id_usuario, double valor);
-void inscrever_menu(char *id_curso, char* id_usuario);
-void cadastrar_categoria_menu(char* titulo, char* categoria);
-void atualizar_status_inscricoes_menu(char* id_usuario, char* titulo, char status);
- 
+void cadastrar_curso_menu(char *titulo, char *instituicao, char *ministrante, char *lancamento, int carga, double valor);
+void adicionar_saldo_menu(char *id_usuario, double valor);
+void inscrever_menu(char *id_curso, char *id_usuario);
+void cadastrar_categoria_menu(char *titulo, char *categoria);
+void atualizar_status_inscricoes_menu(char *id_usuario, char *titulo, char status);
+
 /* Busca */
 void buscar_usuario_id_menu(char *id_usuario);
 void buscar_curso_id_menu(char *id_curso);
 void buscar_curso_titulo_menu(char *titulo);
- 
+
 /* Listagem */
 void listar_usuarios_id_menu();
 void listar_cursos_categorias_menu(char *categoria);
 void listar_inscricoes_periodo_menu(char *data_inicio, char *data_fim);
- 
+
 /* Liberar espaço */
 void liberar_espaco_menu();
- 
+
 /* Imprimir arquivos de dados */
 void imprimir_arquivo_usuarios_menu();
 void imprimir_arquivo_cursos_menu();
 void imprimir_arquivo_inscricoes_menu();
- 
+
 /* Imprimir índices primários */
 void imprimir_usuarios_idx_menu();
 void imprimir_cursos_idx_menu();
 void imprimir_inscricoes_idx_menu();
- 
+
 /* Imprimir índices secundários */
 void imprimir_titulo_idx_menu();
 void imprimir_data_curso_usuario_idx_menu();
 void imprimir_categorias_secundario_idx_menu();
 void imprimir_categorias_primario_idx_menu();
- 
+
 /* Funções de manipulação de Lista Invertida */
 /**
  * Responsável por inserir duas chaves (chave_secundaria e chave_primaria) em uma Lista Invertida (t).<br />
@@ -635,7 +680,7 @@ void imprimir_categorias_primario_idx_menu();
  * @param t Ponteiro para a Lista Invertida na qual serão inseridas as chaves.
  */
 void inverted_list_insert(char *chave_secundaria, char *chave_primaria, inverted_list *t);
- 
+
 /**
  * Responsável por buscar uma chave no índice secundário de uma Lista invertida (T). O valor de retorno indica se a chave foi encontrada ou não.
  * O ponteiro para o int result pode ser fornecido opcionalmente, e conterá o índice inicial das chaves no registro primário.<br />
@@ -666,11 +711,11 @@ void inverted_list_insert(char *chave_secundaria, char *chave_primaria, inverted
  * @return Indica se a chave foi encontrada.
  */
 bool inverted_list_secondary_search(int *result, bool exibir_caminho, char *chave_secundaria, inverted_list *t);
- 
+
 /**
  * Responsável por percorrer o índice primário de uma Lista invertida (T). O valor de retorno indica a quantidade de chaves encontradas.
  * O ponteiro para o vetor de strings result pode ser fornecido opcionalmente, e será populado com a lista de todas as chaves encontradas.
- * O ponteiro para o inteiro indice_final também pode ser fornecido opcionalmente, e deve conter o índice do último campo da lista encadeada 
+ * O ponteiro para o inteiro indice_final também pode ser fornecido opcionalmente, e deve conter o índice do último campo da lista encadeada
  * da chave primaria fornecida (isso é útil na inserção de um novo registro).<br />
  * <br />
  * Exemplos de uso:<br />
@@ -715,7 +760,7 @@ int inverted_list_primary_search(char result[][TAM_CHAVE_CATEGORIAS_PRIMARIO_IDX
  * @param t Ponteiro para o índice da Lista Invertida no qual será buscada a chave.
  * @return Indica se a chave foi encontrada.
  */
-bool inverted_list_binary_search(int* result, bool exibir_caminho, char *chave, inverted_list *t);
+bool inverted_list_binary_search(int *result, bool exibir_caminho, char *chave, inverted_list *t);
 
 /* Funções de manipulação de Árvores-B */
 /**
@@ -736,7 +781,20 @@ bool inverted_list_binary_search(int* result, bool exibir_caminho, char *chave, 
  * @param chave Chave a ser inserida na Árvore-B.
  * @param t Ponteiro para o índice do tipo Árvore-B no qual será inserida a chave.
  */
-void btree_insert(char *chave, btree *t);
+void btree_insert(char *chave, btree *t)
+{
+    promovido_aux promo = btree_insert_aux(chave, 0, t);
+    if (promo.chave_promovida != NULL)
+    {
+        // A raiz foi dividida, portanto precisamos criar uma nova raiz
+        btree_node nova_raiz = btree_node_malloc(t);
+        nova_raiz.chaves[0] = promo.chave_promovida;
+        nova_raiz.filhos[0] = t->rrn_raiz;
+        nova_raiz.filhos[1] = promo.filho_direito;
+        nova_raiz.qtd_chaves = 1;
+        t->rrn_raiz = nova_raiz.this_rrn;
+    }
+}
 
 /**
  * Função auxiliar de inserção de uma chave (k) em uma Árvore-B (T). Atualiza os parâmetros da Árvore-B conforme necessário.<br />
@@ -753,7 +811,7 @@ promovido_aux btree_insert_aux(char *chave, int rrn, btree *t);
  * Função auxiliar para dividir um nó de uma Árvore-B (T). Atualiza os parâmetros conforme necessário.<br />
  *
  * @param promo Uma struct do tipo promovido_aux que contém a chave a ser inserida e o RRN do seu filho direito.
- * @param node Ponteiro para nó que deve ser dividido. 
+ * @param node Ponteiro para nó que deve ser dividido.
  * @param i O índice da posição onde a chave a ser inserida deve estar.
  * @param t Ponteiro para o índice do tipo Árvore-B no qual será inserida a chave.
  * @return Retorna uma struct do tipo promovido_aux que contém a chave promovida e o RRN do filho direito.
@@ -792,10 +850,10 @@ void btree_delete(char *chave, btree *t);
 bool btree_delete_aux(char *chave, int rrn, btree *t);
 
 /**
- * Função auxiliar para redistribuir ou concatenar nós irmãos adjacentes à esquerda e à direita de um nó pai em uma Árvore-B (T). 
+ * Função auxiliar para redistribuir ou concatenar nós irmãos adjacentes à esquerda e à direita de um nó pai em uma Árvore-B (T).
  * Atualiza os parâmetros conforme necessário.<br />
  *
- * @param node Ponteiro para nó pai dos nós irmãos adjacentes que deve ser redistribuidos ou concatenados. 
+ * @param node Ponteiro para nó pai dos nós irmãos adjacentes que deve ser redistribuidos ou concatenados.
  * @param i O índice da posição no nó pai onde se encontra a chave separadora dos nós irmãos adjacentes.
  * @param t Ponteiro para o índice do tipo Árvore-B no qual serão redistribuídos ou concatenados os nós irmãos adjacentes.
  * @return Indica se a redistribuição ou concatenação deixou o nó pai com menos chaves que o mínimo necessário.
@@ -830,8 +888,8 @@ bool btree_borrow_or_merge(btree_node *node, int i, btree *t);
  * bool found = btree_search(NULL, false, titulo_str, titulo_idx.rrn_raiz, &titulo_idx);<br />
  * ...<br />
  * <br />
-* // Exemplo 4. Há interesse no caminho feito para encontrar a chave.<br />
-  * ...<br />
+ * // Exemplo 4. Há interesse no caminho feito para encontrar a chave.<br />
+ * ...<br />
  * char result[TAM_CHAVE_USUARIOS_IDX + 1];<br />
  * printf(RRN_NOS);<br />
  * bool found = btree_search(result, true, id_usuario, usuarios_idx.rrn_raiz, &usuarios_idx);<br />
@@ -849,7 +907,7 @@ bool btree_search(char *result, bool exibir_caminho, char *chave, int rrn, btree
 
 /**
  * Responsável por buscar uma chave (k) dentro do nó de uma Árvore-B (T) de forma eficiente. O valor de retorno indica se a chave foi encontrada ou não.
- * O ponteiro para o int result pode ser fornecido opcionalmente, e indica o índice da chave encontrada (caso tenha sido encontrada) 
+ * O ponteiro para o int result pode ser fornecido opcionalmente, e indica o índice da chave encontrada (caso tenha sido encontrada)
  * ou o índice do filho onde esta chave deve estar (caso não tenha sido encontrada).<br />
  *
  * @param result Ponteiro para ser escrito o índice da chave encontrada ou do filho onde ela deve estar. É ignorado caso NULL.
@@ -859,7 +917,7 @@ bool btree_search(char *result, bool exibir_caminho, char *chave, int rrn, btree
  * @param t Ponteiro para o índice do tipo Árvore-B no qual será buscada a chave.
  * @return Indica se a chave foi encontrada.
  */
-bool btree_binary_search(int *result, bool exibir_caminho, char* chave, btree_node* node, btree* t);
+bool btree_binary_search(int *result, bool exibir_caminho, char *chave, btree_node *node, btree *t);
 
 /**
  * Função para percorrer uma Árvore-B (T) em ordem.<br />
@@ -934,30 +992,30 @@ int btree_register_size(btree *t);
  * @param pad Caractere utilizado para fazer o preenchimento à direita.
  * @param size Tamanho desejado para a string.
  */
-char* strpadright(char *str, char pad, unsigned size);
+char *strpadright(char *str, char pad, unsigned size);
 
 /**
  * Converte uma string str para letras maiúsculas.<br />
  *
  * @param str Ponteiro para a string a ser manipulada.
  */
-char* strupr(char *str);
+char *strupr(char *str);
 
 /**
  * Converte uma string str para letras minúsculas.<br />
  *
  * @param str Ponteiro para a string a ser manipulada.
  */
-char* strlower(char *str);
- 
+char *strlower(char *str);
+
 /* <<< COLOQUE AQUI OS DEMAIS PROTÓTIPOS DE FUNÇÕES, SE NECESSÁRIO >>> */
 
- 
 /* ==========================================================================
  * ============================ FUNÇÃO PRINCIPAL ============================
  * =============================== NÃO ALTERAR ============================== */
- 
-int main() {
+
+int main()
+{
     // variáveis utilizadas pelo interpretador de comandos
     char input[500];
     uint64_t seed = 2;
@@ -977,49 +1035,54 @@ int main() {
     char data_inicio[TAM_DATETIME];
     char data_fim[TAM_DATETIME];
     char status;
- 
+
     scanf("SET BTREE_ORDER %d;\n", &btree_order);
 
     scanf("SET ARQUIVO_USUARIOS TO '%[^']';\n", ARQUIVO_USUARIOS);
     int temp_len = strlen(ARQUIVO_USUARIOS);
     qtd_registros_usuarios = temp_len / TAM_REGISTRO_USUARIO;
     ARQUIVO_USUARIOS[temp_len] = '\0';
- 
+
     scanf("SET ARQUIVO_CURSOS TO '%[^']';\n", ARQUIVO_CURSOS);
     temp_len = strlen(ARQUIVO_CURSOS);
     qtd_registros_cursos = temp_len / TAM_REGISTRO_CURSO;
     ARQUIVO_CURSOS[temp_len] = '\0';
- 
+
     scanf("SET ARQUIVO_INSCRICOES TO '%[^']';\n", ARQUIVO_INSCRICOES);
     temp_len = strlen(ARQUIVO_INSCRICOES);
     qtd_registros_inscricoes = temp_len / TAM_REGISTRO_INSCRICAO;
     ARQUIVO_INSCRICOES[temp_len] = '\0';
- 
+
     // inicialização do gerador de números aleatórios e função de datas
     prng_srand(seed);
     putenv("TZ=UTC");
     set_time(datetime);
- 
+
     criar_usuarios_idx();
     criar_cursos_idx();
     criar_inscricoes_idx();
     criar_titulo_idx();
     criar_data_curso_usuario_idx();
     criar_categorias_idx();
- 
-    while (1) {
+
+    while (1)
+    {
         fgets(input, 500, stdin);
         printf("%s", input);
         clear_input(input);
- 
+
         if (strcmp("", input) == 0)
             continue; // não avança o tempo nem imprime o comando este seja em branco
- 
+
         /* Funções principais */
         if (sscanf(input, "INSERT INTO usuarios VALUES ('%[^']', '%[^']', '%[^']', '%[^']');", id_usuario, nome, email, telefone) == 4)
             cadastrar_usuario_menu(id_usuario, nome, email, telefone);
         else if (sscanf(input, "INSERT INTO usuarios VALUES ('%[^']', '%[^']', '%[^']');", id_usuario, nome, email) == 3)
-            { strcpy(telefone, ""); strpadright(telefone, '*', TAM_TELEFONE-1); cadastrar_usuario_menu(id_usuario, nome, email, telefone); }
+        {
+            strcpy(telefone, "");
+            strpadright(telefone, '*', TAM_TELEFONE - 1);
+            cadastrar_usuario_menu(id_usuario, nome, email, telefone);
+        }
         else if (sscanf(input, "UPDATE usuarios SET telefone = '%[^']' WHERE id_usuario = '%[^']';", telefone, id_usuario) == 2)
             cadastrar_telefone_menu(id_usuario, telefone);
         else if (sscanf(input, "DELETE FROM usuarios WHERE id_usuario = '%[^']';", id_usuario) == 1)
@@ -1034,7 +1097,7 @@ int main() {
             cadastrar_categoria_menu(titulo, categoria);
         else if (sscanf(input, "UPDATE inscricoes SET status = '%c' WHERE id_curso = (SELECT id_curso FROM cursos WHERE titulo = '%[^']') AND id_usuario = '%[^']';", &status, titulo, id_usuario) == 3)
             atualizar_status_inscricoes_menu(id_usuario, titulo, status);
- 
+
         /* Busca */
         else if (sscanf(input, "SELECT * FROM usuarios WHERE id_usuario = '%[^']';", id_usuario) == 1)
             buscar_usuario_id_menu(id_usuario);
@@ -1042,7 +1105,7 @@ int main() {
             buscar_curso_id_menu(id_curso);
         else if (sscanf(input, "SELECT * FROM cursos WHERE titulo = '%[^']';", titulo) == 1)
             buscar_curso_titulo_menu(titulo);
- 
+
         /* Listagem */
         else if (strcmp("SELECT * FROM usuarios ORDER BY id_usuario ASC;", input) == 0)
             listar_usuarios_id_menu();
@@ -1050,11 +1113,11 @@ int main() {
             listar_cursos_categorias_menu(categoria);
         else if (sscanf(input, "SELECT * FROM inscricoes WHERE data_inscricao BETWEEN '%[^']' AND '%[^']' ORDER BY data_inscricao ASC;", data_inicio, data_fim) == 2)
             listar_inscricoes_periodo_menu(data_inicio, data_fim);
- 
+
         /* Liberar espaço */
         else if (strcmp("VACUUM usuarios;", input) == 0)
             liberar_espaco_menu();
- 
+
         /* Imprimir arquivos de dados */
         else if (strcmp("\\echo file ARQUIVO_USUARIOS", input) == 0)
             imprimir_arquivo_usuarios_menu();
@@ -1062,7 +1125,7 @@ int main() {
             imprimir_arquivo_cursos_menu();
         else if (strcmp("\\echo file ARQUIVO_INSCRICOES", input) == 0)
             imprimir_arquivo_inscricoes_menu();
-        
+
         /* Imprimir índices primários */
         else if (strcmp("\\echo index usuarios_idx", input) == 0)
             imprimir_usuarios_idx_menu();
@@ -1070,7 +1133,7 @@ int main() {
             imprimir_cursos_idx_menu();
         else if (strcmp("\\echo index inscricoes_idx", input) == 0)
             imprimir_inscricoes_idx_menu();
- 
+
         /* Imprimir índices secundários */
         else if (strcmp("\\echo index titulo_idx", input) == 0)
             imprimir_titulo_idx_menu();
@@ -1080,27 +1143,41 @@ int main() {
             imprimir_categorias_secundario_idx_menu();
         else if (strcmp("\\echo index categorias_primario_idx", input) == 0)
             imprimir_categorias_primario_idx_menu();
- 
+
         /* Liberar memória eventualmente alocada e encerrar programa */
         else if (strcmp("\\q", input) == 0)
-            { return 0; }
+        {
+            return 0;
+        }
         else if (sscanf(input, "SET SRAND %lu;", &seed) == 1)
-            { prng_srand(seed); printf(SUCESSO); continue; }
+        {
+            prng_srand(seed);
+            printf(SUCESSO);
+            continue;
+        }
         else if (sscanf(input, "SET TIME '%[^']';", datetime) == 1)
-            { if (set_time(datetime)) printf(SUCESSO); else printf(ERRO_VALOR_INVALIDO); continue; }
+        {
+            if (set_time(datetime))
+                printf(SUCESSO);
+            else
+                printf(ERRO_VALOR_INVALIDO);
+            continue;
+        }
         else
             printf(ERRO_OPCAO_INVALIDA);
- 
+
         tick_time();
     }
 }
- 
+
 /* ========================================================================== */
- 
+
 /* Cria o índice primário usuarios_idx */
-void criar_usuarios_idx() {
+void criar_usuarios_idx()
+{
     char usuario_str[TAM_CHAVE_USUARIOS_IDX + 1];
-    for (unsigned i = 0; i < qtd_registros_usuarios; ++i) {
+    for (unsigned i = 0; i < qtd_registros_usuarios; ++i)
+    {
         Usuario u = recuperar_registro_usuario(i);
 
         sprintf(usuario_str, "%s%04d", u.id_usuario, i);
@@ -1108,96 +1185,116 @@ void criar_usuarios_idx() {
     }
     printf(INDICE_CRIADO, "usuarios_idx");
 }
- 
+
 /* Cria o índice primário cursos_idx */
-void criar_cursos_idx() {
+void criar_cursos_idx()
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "criar_cursos_idx");
+    char curso_str[TAM_CHAVE_CURSOS_IDX + 1];
+    for (unsigned i = 0; i < qtd_registros_cursos; i++)
+    {
+        Curso c = recuperar_registro_curso(i);
+
+        sprintf(curso_str, "%s%04d", c.id_curso, i);
+        btree_insert(curso_str, &cursos_idx);
+    }
+    printf(INDICE_CRIADO, "criar_cursos_idx");
 }
- 
+
 /* Cria o índice primário inscricoes_idx */
-void criar_inscricoes_idx() {
+void criar_inscricoes_idx()
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "criar_inscricoes_idx");
 }
- 
+
 /* Cria o índice secundário titulo_idx */
-void criar_titulo_idx() {
+void criar_titulo_idx()
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "criar_titulo_idx");
 }
- 
+
 /* Cria o índice secundário data_curso_usuario_idx */
-void criar_data_curso_usuario_idx() {
+void criar_data_curso_usuario_idx()
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "criar_data_curso_usuario_idx");
 }
- 
+
 /* Cria os índices (secundário e primário) de categorias_idx */
-void criar_categorias_idx() {
+void criar_categorias_idx()
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "criar_categorias_idx");
 }
- 
- 
+
 /* Exibe um usuario dado seu RRN */
-bool exibir_usuario(int rrn) {
+bool exibir_usuario(int rrn)
+{
     if (rrn < 0)
         return false;
- 
+
     Usuario u = recuperar_registro_usuario(rrn);
- 
+
     printf("%s, %s, %s, %s, %.2lf\n", u.id_usuario, u.nome, u.email, u.telefone, u.saldo);
     return true;
 }
- 
+
 /* Exibe um curso dado seu RRN */
-bool exibir_curso(int rrn) {
+bool exibir_curso(int rrn)
+{
     if (rrn < 0)
         return false;
- 
+
     Curso j = recuperar_registro_curso(rrn);
- 
+
     printf("%s, %s, %s, %s, %s, %d, %.2lf\n", j.id_curso, j.titulo, j.instituicao, j.ministrante, j.lancamento, j.carga, j.valor);
     return true;
 }
- 
+
 /* Exibe uma inscricao dado seu RRN */
-bool exibir_inscricao(int rrn) {
+bool exibir_inscricao(int rrn)
+{
     if (rrn < 0)
         return false;
- 
+
     Inscricao c = recuperar_registro_inscricao(rrn);
- 
+
     printf("%s, %s, %s, %c, %s\n", c.id_curso, c.id_usuario, c.data_inscricao, c.status, c.data_atualizacao);
- 
+
     return true;
 }
- 
-bool exibir_btree_usuario(char *chave) {
+
+bool exibir_btree_usuario(char *chave)
+{
     int rrn = atoi(chave + TAM_ID_USUARIO - 1);
     return exibir_usuario(rrn);
 }
 
-bool exibir_btree_curso(char *chave) {
+bool exibir_btree_curso(char *chave)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "exibir_btree_curso");
     return false;
 }
 
-bool exibir_btree_inscricao(char *chave) {
+bool exibir_btree_inscricao(char *chave)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "exibir_btree_inscricao");
     return false;
 }
 
-bool exibir_btree_titulo(char *chave) {
+bool exibir_btree_titulo(char *chave)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "exibir_btree_titulo");
     return false;
 }
 
-bool exibir_btree_data_curso_usuario(char *chave) {
+bool exibir_btree_data_curso_usuario(char *chave)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "exibir_btree_data_curso_usuario");
     return false;
@@ -1205,12 +1302,13 @@ bool exibir_btree_data_curso_usuario(char *chave) {
 
 /* Recupera do arquivo de usuários o registro com o RRN
  * informado e retorna os dados na struct Usuario */
-Usuario recuperar_registro_usuario(int rrn) {
+Usuario recuperar_registro_usuario(int rrn)
+{
     Usuario u;
     char temp[TAM_REGISTRO_USUARIO + 1], *p;
     strncpy(temp, ARQUIVO_USUARIOS + (rrn * TAM_REGISTRO_USUARIO), TAM_REGISTRO_USUARIO);
     temp[TAM_REGISTRO_USUARIO] = '\0';
- 
+
     p = strtok(temp, ";");
     strcpy(u.id_usuario, p);
     p = strtok(NULL, ";");
@@ -1222,31 +1320,87 @@ Usuario recuperar_registro_usuario(int rrn) {
     p = strtok(NULL, ";");
     u.saldo = atof(p);
     p = strtok(NULL, ";");
- 
+
     return u;
 }
- 
+
 /* Recupera do arquivo de cursos o registro com o RRN
  * informado e retorna os dados na struct Curso */
-Curso recuperar_registro_curso(int rrn) {
+Curso recuperar_registro_curso(int rrn)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "recuperar_registro_curso");
+    Curso c;
+    char temp[TAM_REGISTRO_CURSO + 1], *p, *token_categorias;
+    strncpy(temp, ARQUIVO_CURSOS + (rrn * TAM_REGISTRO_CURSO), TAM_REGISTRO_CURSO);
+    temp[TAM_REGISTRO_CURSO] = '\0';
+
+    p = strtok(temp, ";");
+    strcpy(c.id_curso, p);
+    p = strtok(NULL, ";");
+    strcpy(c.titulo, p);
+    p = strtok(NULL, ";");
+    strcpy(c.instituicao, p);
+    p = strtok(NULL, ";");
+    strcpy(c.ministrante, p);
+    p = strtok(NULL, ";");
+    strcpy(c.lancamento, p);
+    p = strtok(NULL, ";");
+    c.carga = atoi(p);
+    p = strtok(NULL, ";");
+    c.valor = atof(p);
+    p = strtok(NULL, ";");
+    token_categorias = strtok(p, "|");
+    for (int i = 0; i < QTD_MAX_CATEGORIAS; i++)
+    {
+        if (!token_categorias) // se nao tem mais categorias para ler(caso em que tem apenas 1 categoria)
+            break;
+        if (token_categorias[0] != '#')
+        {
+            strcpy(c.categorias[i], token_categorias);
+            token_categorias = strtok(NULL, "|");
+        }
+        else
+        {
+            strcpy(c.categorias[i], "");
+        }
+    }
+
+    return c;
 }
- 
+
 /* Recupera do arquivo de inscricoes o registro com o RRN
  * informado e retorna os dados na struct Inscricao */
-Inscricao recuperar_registro_inscricao(int rrn) {
+Inscricao recuperar_registro_inscricao(int rrn)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "recuperar_registro_inscricao");
+    Inscricao i;
+    char temp[TAM_REGISTRO_INSCRICAO + 1], *p;
+    strncpy(temp, ARQUIVO_INSCRICOES + (rrn * TAM_REGISTRO_INSCRICAO),
+            TAM_REGISTRO_INSCRICAO);
+    temp[TAM_REGISTRO_INSCRICAO] = '\0';
+
+    p = temp;
+    // Como uso strncpy para copiar os dados para a struct, precisa colocar o \0 no final de cada string
+    strncpy(i.id_curso, temp, 8);
+    i.id_curso[8] = '\0';
+    strncpy(i.id_usuario, temp + 8, 11);
+    i.id_usuario[11] = '\0';
+    strncpy(i.data_inscricao, temp + 19, 12);
+    i.data_inscricao[12] = '\0';
+    i.status = temp[31];
+    strncpy(i.data_atualizacao, temp + 32, 12);
+    i.data_atualizacao[12] = '\0';
+    return i;
 }
- 
- 
+
 /* Escreve no arquivo de usuários na posição informada (RRN)
  * os dados na struct Usuario */
-void escrever_registro_usuario(Usuario u, int rrn) {
+void escrever_registro_usuario(Usuario u, int rrn)
+{
     char temp[TAM_REGISTRO_USUARIO + 1], p[100];
-    temp[0] = '\0'; p[0] = '\0';
- 
+    temp[0] = '\0';
+    p[0] = '\0';
+
     strcpy(temp, u.id_usuario);
     strcat(temp, ";");
     strcat(temp, u.nome);
@@ -1258,325 +1412,509 @@ void escrever_registro_usuario(Usuario u, int rrn) {
     sprintf(p, "%013.2lf", u.saldo);
     strcat(temp, p);
     strcat(temp, ";");
- 
+
     strpadright(temp, '#', TAM_REGISTRO_USUARIO);
- 
-    strncpy(ARQUIVO_USUARIOS + rrn*TAM_REGISTRO_USUARIO, temp, TAM_REGISTRO_USUARIO);
+
+    strncpy(ARQUIVO_USUARIOS + rrn * TAM_REGISTRO_USUARIO, temp, TAM_REGISTRO_USUARIO);
 }
- 
+
 /* Escreve no arquivo de cursos na posição informada (RRN)
  * os dados na struct Curso */
-void escrever_registro_curso(Curso j, int rrn) {
+void escrever_registro_curso(Curso j, int rrn)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "escrever_registro_curso");
+    char temp[TAM_REGISTRO_CURSO + 1], p[100];
+    temp[0] = '\0';
+    p[0] = '\0';
+    int tam_max = 256;
+    char *t;
+    strcpy(temp, j.id_curso);
+    strcat(temp, ";");
+    strcat(temp, j.titulo);
+    strcat(temp, ";");
+    strcat(temp, j.instituicao);
+    strcat(temp, ";");
+    strcat(temp, j.ministrante);
+    strcat(temp, ";");
+    strcat(temp, j.lancamento);
+    strcat(temp, ";");
+    sprintf(p, "%04d", j.carga);
+    strcat(temp, p);
+    strcat(temp, ";");
+    sprintf(p, "%013.2lf", j.valor);
+    strcat(temp, p);
+    strcat(temp, ";");
+    for (int i = 0; i < QTD_MAX_CATEGORIAS; i++)
+    {
+        if (strcmp(j.categorias[i], "") != 0 && j.categorias[i][0] != '#')
+        {               // Casos que a categoria nao esta vazia
+            if (i == 1) // Caso em que tem 2 categorias
+                strcat(temp, "|");
+            strcpy(p, j.categorias[i]);
+            strcat(temp, p);
+            if (i == 2 && j.categorias[i][0] != '#') // Caso em que tem 3 categorias
+                strcat(temp, "|");
+        }
+    }
+    strcat(temp, ";");
+
+    strpadright(temp, '#', TAM_REGISTRO_CURSO);
+
+    strncpy(ARQUIVO_CURSOS + rrn * TAM_REGISTRO_CURSO, temp, TAM_REGISTRO_CURSO);
+    ARQUIVO_CURSOS[qtd_registros_cursos * TAM_REGISTRO_CURSO] = '\0';
 }
- 
+
 /* Escreve no arquivo de inscricoes na posição informada (RRN)
  * os dados na struct Inscricao */
-void escrever_registro_inscricao(Inscricao c, int rrn) {
+void escrever_registro_inscricao(Inscricao c, int rrn)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "escrever_registro_inscricao");
+    char temp[TAM_REGISTRO_INSCRICAO + 1], p[100];
+    temp[0] = p[0] = '\0';
+
+    strcpy(temp, c.id_curso);
+    strcat(temp, c.id_usuario);
+    strcat(temp, c.data_inscricao);
+    sprintf(p, "%c", c.status);
+    strcat(temp, p);
+    strcat(temp, c.data_atualizacao);
+
+    strncpy(ARQUIVO_INSCRICOES + rrn * TAM_REGISTRO_INSCRICAO, temp, TAM_REGISTRO_INSCRICAO);
+    ARQUIVO_INSCRICOES[qtd_registros_inscricoes * TAM_REGISTRO_INSCRICAO] = '\0';
+    printf("%s\n", ARQUIVO_INSCRICOES);
 }
- 
- 
+
 /* Funções principais */
-void cadastrar_usuario_menu(char *id_usuario, char *nome, char *email, char *telefone) {
+void cadastrar_usuario_menu(char *id_usuario, char *nome, char *email, char *telefone)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_usuario_menu");
 }
 
-void cadastrar_telefone_menu(char* id_usuario, char* telefone) {
+void cadastrar_telefone_menu(char *id_usuario, char *telefone)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_telefone_menu");
 }
 
-void remover_usuario_menu(char *id_usuario) {
+void remover_usuario_menu(char *id_usuario)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "remover_usuario_menu");
 }
- 
-void cadastrar_curso_menu(char *titulo, char *instituicao, char *ministrante, char* lancamento, int carga, double valor) {
+
+void cadastrar_curso_menu(char *titulo, char *instituicao, char *ministrante, char *lancamento, int carga, double valor)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_curso_menu");
 }
- 
-void adicionar_saldo_menu(char *id_usuario, double valor) {
+
+void adicionar_saldo_menu(char *id_usuario, double valor)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "adicionar_saldo_menu");
 }
- 
- 
-void inscrever_menu(char *id_curso, char *id_usuario) {
+
+void inscrever_menu(char *id_curso, char *id_usuario)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "inscrever_menu");
 }
- 
- 
-void cadastrar_categoria_menu(char* titulo, char* categoria) {
+
+void cadastrar_categoria_menu(char *titulo, char *categoria)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_categoria_menu");
 }
- 
- 
-void atualizar_status_inscricoes_menu(char *id_usuario, char *titulo, char status) {
+
+void atualizar_status_inscricoes_menu(char *id_usuario, char *titulo, char status)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "atualizar_status_inscricoes_menu");
 }
 
-
 /* Busca */
-void buscar_usuario_id_menu(char *id_usuario) {
+void buscar_usuario_id_menu(char *id_usuario)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "buscar_usuario_id_menu");
 }
- 
-void buscar_curso_id_menu(char *id_curso) {
+
+void buscar_curso_id_menu(char *id_curso)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "buscar_curso_id_menu");
 }
- 
-void buscar_curso_titulo_menu(char *titulo) {
+
+void buscar_curso_titulo_menu(char *titulo)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "buscar_curso_titulo_menu");
 }
- 
- 
+
 /* Listagem */
-void listar_usuarios_id_menu() {
+void listar_usuarios_id_menu()
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "listar_usuarios_id_menu");
 }
- 
-void listar_cursos_categorias_menu(char *categoria) {
+
+void listar_cursos_categorias_menu(char *categoria)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "listar_cursos_categorias_menu");
 }
- 
-void listar_inscricoes_periodo_menu(char *data_inicio, char *data_fim) {
+
+void listar_inscricoes_periodo_menu(char *data_inicio, char *data_fim)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "listar_inscricoes_periodo_menu");
 }
 
-
 /* Liberar espaço */
-void liberar_espaco_menu() {
+void liberar_espaco_menu()
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "liberar_espaco_menu");
 }
- 
- 
+
 /* Imprimir arquivos de dados */
-void imprimir_arquivo_usuarios_menu() {
+void imprimir_arquivo_usuarios_menu()
+{
     if (qtd_registros_usuarios == 0)
         printf(ERRO_ARQUIVO_VAZIO);
     else
         printf("%s\n", ARQUIVO_USUARIOS);
 }
- 
-void imprimir_arquivo_cursos_menu() {
+
+void imprimir_arquivo_cursos_menu()
+{
     if (qtd_registros_cursos == 0)
         printf(ERRO_ARQUIVO_VAZIO);
     else
         printf("%s\n", ARQUIVO_CURSOS);
 }
- 
-void imprimir_arquivo_inscricoes_menu() {
+
+void imprimir_arquivo_inscricoes_menu()
+{
     if (qtd_registros_inscricoes == 0)
         printf(ERRO_ARQUIVO_VAZIO);
     else
         printf("%s\n", ARQUIVO_INSCRICOES);
 }
- 
- 
+
 /* Imprimir índices primários */
-void imprimir_usuarios_idx_menu() {
+void imprimir_usuarios_idx_menu()
+{
     if (usuarios_idx.qtd_nos == 0)
         printf(ERRO_ARQUIVO_VAZIO);
     else
         printf("%s\n", ARQUIVO_USUARIOS_IDX);
 }
 
-void imprimir_cursos_idx_menu() {
+void imprimir_cursos_idx_menu()
+{
     if (cursos_idx.qtd_nos == 0)
         printf(ERRO_ARQUIVO_VAZIO);
     else
         printf("%s\n", ARQUIVO_CURSOS_IDX);
 }
 
-void imprimir_inscricoes_idx_menu() {
+void imprimir_inscricoes_idx_menu()
+{
     if (inscricoes_idx.qtd_nos == 0)
         printf(ERRO_ARQUIVO_VAZIO);
     else
         printf("%s\n", ARQUIVO_INSCRICOES_IDX);
 }
- 
- 
+
 /* Imprimir índices secundários */
-void imprimir_titulo_idx_menu() {
+void imprimir_titulo_idx_menu()
+{
     if (titulo_idx.qtd_nos == 0)
         printf(ERRO_ARQUIVO_VAZIO);
     else
         printf("%s\n", ARQUIVO_TITULO_IDX);
 }
 
-void imprimir_data_curso_usuario_idx_menu() {
+void imprimir_data_curso_usuario_idx_menu()
+{
     if (data_curso_usuario_idx.qtd_nos == 0)
         printf(ERRO_ARQUIVO_VAZIO);
     else
         printf("%s\n", ARQUIVO_DATA_CURSO_USUARIO_IDX);
 }
 
-void imprimir_categorias_secundario_idx_menu() {
+void imprimir_categorias_secundario_idx_menu()
+{
     if (categorias_idx.qtd_registros_secundario == 0)
         printf(ERRO_ARQUIVO_VAZIO);
-    else    
+    else
         printf("%s\n", ARQUIVO_CATEGORIAS_SECUNDARIO_IDX);
 }
 
-void imprimir_categorias_primario_idx_menu() {
+void imprimir_categorias_primario_idx_menu()
+{
     if (categorias_idx.qtd_registros_primario == 0)
         printf(ERRO_ARQUIVO_VAZIO);
     else
         printf("%s\n", ARQUIVO_CATEGORIAS_PRIMARIO_IDX);
 }
- 
- 
+
 /* Função de comparação entre chaves do índice usuarios_idx */
-int order_usuarios_idx(const void *key, const void *elem) {
+int order_usuarios_idx(const void *key, const void *elem)
+{
     return strncmp(key, elem, TAM_ID_USUARIO - 1);
 }
- 
+
 /* Função de comparação entre chaves do índice cursos_idx */
-int order_cursos_idx(const void *key, const void *elem) {
+int order_cursos_idx(const void *key, const void *elem)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "order_cursos_idx");
-    return -1;
+    return strncmp(key, elem, TAM_ID_CURSO - 1);
 }
- 
+
 /* Função de comparação entre chaves do índice inscricoes_idx */
-int order_inscricoes_idx(const void *key, const void *elem) {
+int order_inscricoes_idx(const void *key, const void *elem)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "order_inscricoes_idx");
-    return -1;
+    return strncmp(key, elem, TAM_ID_USUARIO + TAM_ID_CURSO - 2);
 }
- 
+
 /* Função de comparação entre chaves do índice titulo_idx */
-int order_titulo_idx(const void *key, const void *elem) {
+int order_titulo_idx(const void *key, const void *elem)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "order_titulo_idx");
-    return -1;
+
+    return strncmp(key, elem, TAM_MAX_TITULO - 1);
 }
- 
+
 /* Funções de comparação entre chaves do índice data_curso_usuario_idx */
-int order_data_curso_usuario_idx(const void *key, const void *elem) {
+int order_data_curso_usuario_idx(const void *key, const void *elem)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "order_data_curso_usuario_idx");
     return -1;
 }
- 
+
 /* Função de comparação entre chaves do índice secundário de categorias_idx */
-int order_categorias_idx(const void *key, const void *elem) {
+int order_categorias_idx(const void *key, const void *elem)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "order_categorias_idx");
-    return -1;
-}
- 
- 
-/* Funções de manipulação de Lista Invertida */
-void inverted_list_insert(char *chave_secundaria, char *chave_primaria, inverted_list *t) {
-    /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "inverted_list_insert");
-}
- 
-bool inverted_list_secondary_search(int *result, bool exibir_caminho, char *chave_secundaria, inverted_list *t) {
-    /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "inverted_list_secondary_search");
-    return false;
-}
- 
-int inverted_list_primary_search(char result[][TAM_CHAVE_CATEGORIAS_PRIMARIO_IDX], bool exibir_caminho, int indice, int *indice_final, inverted_list *t) {
-    /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "inverted_list_primary_search");
-    return -1;
+    return strncmp(key, elem, TAM_MAX_CATEGORIA - 1);
 }
 
-bool inverted_list_binary_search(int* result, bool exibir_caminho, char *chave, inverted_list *t) {
+/* Funções de manipulação de Lista Invertida */
+void inverted_list_insert(char *chave_secundaria, char *chave_primaria, inverted_list *t)
+{
+    return 0;
+}
+
+bool inverted_list_secondary_search(int *result, bool exibir_caminho, char *chave_secundaria, inverted_list *t)
+{
+    /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+    return false;
+}
+
+int inverted_list_primary_search(char result[][TAM_CHAVE_CATEGORIAS_PRIMARIO_IDX], bool exibir_caminho, int indice, int *indice_final, inverted_list *t)
+{
+    /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+    return 0;
+}
+
+bool inverted_list_binary_search(int *result, bool exibir_caminho, char *chave, inverted_list *t)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "inverted_list_binary_search");
     return false;
 }
 
-
 /* Funções de manipulação de Árvores-B */
-void btree_insert(char *chave, btree *t) {
+void btree_insert(char *chave, btree *t)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "btree_insert");
 }
 
-promovido_aux btree_insert_aux(char *chave, int rrn, btree *t) {
+promovido_aux btree_insert_aux(char *chave, int rrn, btree *t)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "btree_insert_aux");
 }
 
-promovido_aux btree_divide(promovido_aux promo, btree_node *node, int i, btree *t) {
+promovido_aux btree_divide(promovido_aux promo, btree_node *node, int i, btree *t)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "btree_divide");
 }
 
-void btree_delete(char *chave, btree *t) {
+void btree_delete(char *chave, btree *t)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "btree_delete");
 }
 
-bool btree_delete_aux(char *chave, int rrn, btree *t) {
+bool btree_delete_aux(char *chave, int rrn, btree *t)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "btree_delete_aux");
 }
 
-bool btree_borrow_or_merge(btree_node *node, int i, btree *t) {
+bool btree_borrow_or_merge(btree_node *node, int i, btree *t)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "btree_borrow_or_merge");
 }
 
-bool btree_search(char *result, bool exibir_caminho, char *chave, int rrn, btree *t) {
+bool btree_search(char *result, bool exibir_caminho, char *chave, int rrn, btree *t)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "btree_search");
+
+    if (rrn == -1)
+        return false;
+    if (exibir_caminho)
+    {
+        if (t->rrn_raiz == rrn) // Ta na raiz (para imprimir uma vez)
+            printf(RRN_NOS);
+        printf(" %d", rrn);
+    }
+
+    btree_node no = btree_read(rrn, t);
+
+    int pos;
+    if (btree_binary_search(&pos, exibir_caminho, chave, &no, t))
+    {
+        if (result)
+            strcpy(result, no.chaves[pos]);
+        if (exibir_caminho)
+            printf("\n");
+        return true;
+    }
+    else
+    {
+        return btree_search(result, exibir_caminho, chave, no.filhos[pos], t);
+    }
+}
+
+bool btree_binary_search(int *result, bool exibir_caminho, char *chave, btree_node *node, btree *t)
+{
+    /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+    int start = 0;
+    int end = node->qtd_chaves - 1;
+    int middle = 0;
+    if (exibir_caminho)
+        printf(" (");
+
+    while (start <= end)
+    {
+        middle = start + ((end - start + 1) / 2);
+
+        int compar = t->compar(chave, node->chaves[middle]);
+        if (compar == 0)
+        {
+            if (exibir_caminho)
+                printf("%d)", middle);
+            if (!result)
+                *result = middle;
+            return true;
+        }
+        else if (compar < 0)
+        {
+            if (exibir_caminho)
+                printf("%d ", middle);
+            end = middle - 1;
+        }
+        else
+        {
+            if (exibir_caminho)
+                printf("%d ", middle);
+            start = middle + 1;
+        }
+    }
+    if (exibir_caminho)
+        printf("%d)", start);
+    if (!result)
+        *result = start + 1;
     return false;
 }
 
-bool btree_binary_search(int *result, bool exibir_caminho, char* chave, btree_node* node, btree* t) {
-    /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "btree_binary_search");
-    return false;
-}
-
-bool btree_print_in_order(char *chave_inicio, char *chave_fim, bool (*exibir)(char *chave), int rrn, btree *t) {
+bool btree_print_in_order(char *chave_inicio, char *chave_fim, bool (*exibir)(char *chave), int rrn, btree *t)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "btree_print_in_order");
     return false;
 }
 
-btree_node btree_read(int rrn, btree *t) {
+btree_node btree_read(int rrn, btree *t)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "btree_read");
+    btree_node no;
+    unsigned tam_do_no = 3 + ((btree_order - 1) * t->tam_chave) + 1 + (btree_order * 3);
+    unsigned offset = 0;
+    char p[tam_do_no + 1];
+
+    strncpy(p, t->arquivo + rrn * tam_do_no, tam_do_no);
+    p[tam_do_no] = '\0';
+
+    no.this_rrn = rrn;
+
+    // quantidade de chaves
+    char temp[4];
+    strncpy(temp, p + offset, 3);
+    temp[3] = '\0';
+    no.qtd_chaves = atoi(temp);
+    offset += 3;
+
+    for (unsigned i = 0; i < btree_order - 1; i++)
+    {
+        strncpy(no.chaves[i], p + offset, t->tam_chave);
+        no.chaves[i][t->tam_chave] = '\0';
+        offset += t->tam_chave;
+    }
+
+    // folha
+    no.folha = p[offset];
+    offset++;
+
+    for (unsigned i = 0; i < btree_order; i++)
+    {
+        strncpy(temp, p + offset, 3);
+        temp[3] = '\0';
+        if (temp[0] == '*')
+        {
+            no.filhos[i] = -1;
+            offset += 3;
+            continue;
+        }
+        else
+        {
+            no.filhos[i] = atoi(temp);
+            offset += 3;
+        }
+    }
+    return no;
 }
 
-void btree_write(btree_node no, btree *t) {
+void btree_write(btree_node no, btree *t)
+{
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
     printf(ERRO_NAO_IMPLEMENTADO, "btree_write");
 }
 
-int btree_register_size(btree *t) {
-    int chaves_ordenadas = (btree_order-1)*t->tam_chave;
-    return 3 + chaves_ordenadas + 1 + (btree_order*3);
+int btree_register_size(btree *t)
+{
+    int chaves_ordenadas = (btree_order - 1) * t->tam_chave;
+    return 3 + chaves_ordenadas + 1 + (btree_order * 3);
 }
 
-btree_node btree_node_malloc(btree *t) {
+btree_node btree_node_malloc(btree *t)
+{
     btree_node no;
 
-    no.chaves = malloc((btree_order-1) * sizeof(char*));
-    for (int i = 0; i < btree_order-1; ++i) {
-        no.chaves[i] = malloc(t->tam_chave+1);
+    no.chaves = malloc((btree_order - 1) * sizeof(char *));
+    for (int i = 0; i < btree_order - 1; ++i)
+    {
+        no.chaves[i] = malloc(t->tam_chave + 1);
         no.chaves[i][0] = '\0';
     }
 
@@ -1587,30 +1925,33 @@ btree_node btree_node_malloc(btree *t) {
     return no;
 }
 
-void btree_node_free(btree_node no) {
-    for (int i = 0; i < btree_order-1; ++i)
+void btree_node_free(btree_node no)
+{
+    for (int i = 0; i < btree_order - 1; ++i)
         free(no.chaves[i]);
 
     free(no.chaves);
     free(no.filhos);
 }
 
- 
-char* strpadright(char *str, char pad, unsigned size) {
+char *strpadright(char *str, char pad, unsigned size)
+{
     for (unsigned i = strlen(str); i < size; ++i)
         str[i] = pad;
     str[size] = '\0';
     return str;
 }
 
-char *strupr(char *str) {
+char *strupr(char *str)
+{
     for (char *p = str; *p; ++p)
         *p = toupper(*p);
     return str;
 }
- 
-char *strlower(char *str) {
+
+char *strlower(char *str)
+{
     for (char *p = str; *p; ++p)
-         *p = tolower(*p);
+        *p = tolower(*p);
     return str;
 }
