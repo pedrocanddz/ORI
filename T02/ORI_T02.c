@@ -1192,7 +1192,7 @@ void criar_cursos_idx()
 void criar_inscricoes_idx()
 {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    char inscri_str[TAM_ID_USUARIO + TAM_ID_CURSO + 2];
+    char inscri_str[TAM_ID_USUARIO + TAM_ID_CURSO + TAM_RRN_REGISTRO + 1];
     for (unsigned i = 0; i < qtd_registros_inscricoes; i++)
     {
         Inscricao insc = recuperar_registro_inscricao(i);
@@ -1207,7 +1207,7 @@ void criar_inscricoes_idx()
 void criar_titulo_idx()
 {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    char titulo_str[TAM_MAX_TITULO + 1];
+    char titulo_str[TAM_MAX_TITULO + TAM_RRN_REGISTRO + 1];
     for (unsigned i = 0; i < qtd_registros_cursos; i++)
     {
         Curso c = recuperar_registro_curso(i);
@@ -1495,7 +1495,25 @@ void escrever_registro_inscricao(Inscricao c, int rrn)
 void cadastrar_usuario_menu(char *id_usuario, char *nome, char *email, char *telefone)
 {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "cadastrar_usuario_menu");
+    bool achou = btree_search(NULL, false, id_usuario, usuarios_idx.rrn_raiz, &usuarios_idx);
+    if (achou)
+    {
+        printf(ERRO_PK_REPETIDA, id_usuario);
+        return;
+    }
+
+    Usuario u;
+    strcpy(u.id_usuario, id_usuario);
+    strcpy(u.nome, nome);
+    strcpy(u.email, email);
+    strcpy(u.telefone, telefone);
+    u.saldo = 0;
+
+    btree_insert(id_usuario, &usuarios_idx);
+    escrever_registro_usuario(u, qtd_registros_usuarios);
+    qtd_registros_usuarios++;
+
+    printf(SUCESSO);
 }
 
 void cadastrar_telefone_menu(char *id_usuario, char *telefone)
@@ -1740,23 +1758,23 @@ bool inverted_list_binary_search(int *result, bool exibir_caminho, char *chave, 
 void btree_insert(char *chave, btree *t)
 {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
+    char chave_aux[t->tam_chave + 1];
+    sprintf(chave_aux, "%s%04d", chave, qtd_registros_usuarios);
+    chave_aux[t->tam_chave] = '\0';
+
     if (t->rrn_raiz == -1)
     {
         // Árvore vazia
         btree_node nova_raiz = btree_node_malloc(t);
-        strcpy(nova_raiz.chaves[0], chave);
+
+        strcpy(nova_raiz.chaves[0], chave_aux);
         nova_raiz.qtd_chaves = 1;
         nova_raiz.folha = true;
         t->rrn_raiz = nova_raiz.this_rrn = t->qtd_nos++;
+        btree_write(nova_raiz, t);
         return;
     }
-    if (btree_search(NULL, false, chave, t->rrn_raiz, t))
-    {
-        // Chave já existe na árvore
-        printf(ERRO_PK_REPETIDA, chave);
-        return;
-    }
-    promovido_aux promo = btree_insert_aux(chave, t->rrn_raiz, t);
+    promovido_aux promo = btree_insert_aux(chave_aux, t->rrn_raiz, t);
     if (promo.chave_promovida[0] != '\0')
     {
         // A raiz foi dividida, portanto precisamos criar uma nova raiz
@@ -1768,6 +1786,7 @@ void btree_insert(char *chave, btree *t)
         nova_raiz.filhos[1] = promo.filho_direito;
         nova_raiz.qtd_chaves = 1;
         t->rrn_raiz = nova_raiz.this_rrn;
+        btree_write(nova_raiz, t);
     }
 }
 
@@ -1798,6 +1817,8 @@ promovido_aux btree_insert_aux(char *chave, int rrn, btree *t)
 
             strncpy(node.chaves[pos], chave, t->tam_chave);
             node.chaves[node.qtd_chaves][t->tam_chave] = '\0';
+            node.qtd_chaves++;
+            btree_write(node, t);
             return promo;
         }
         else
@@ -1827,6 +1848,9 @@ promovido_aux btree_insert_aux(char *chave, int rrn, btree *t)
                 node.chaves[node.qtd_chaves][t->tam_chave] = '\0';
                 promo.chave_promovida[0] = '\0';
                 promo.filho_direito = -1;
+                node.qtd_chaves++;
+                btree_write(node, t);
+
                 return promo;
             }
             else
@@ -1895,6 +1919,7 @@ promovido_aux btree_divide(promovido_aux promo, btree_node *node, int i, btree *
         novo_node.chaves[i][t->tam_chave] = '\0';
         promo.chave_promovida[0] = '\0';
     }
+    return promo;
 }
 
 void btree_delete(char *chave, btree *t)
@@ -1985,7 +2010,7 @@ bool btree_binary_search(int *result, bool exibir_caminho, char *chave, btree_no
     if (exibir_caminho)
         printf("%d)", start);
     if (!result)
-        *result = start + 1;
+        *result = start;
     return false;
 }
 
@@ -1999,12 +2024,12 @@ bool btree_print_in_order(char *chave_inicio, char *chave_fim, bool (*exibir)(ch
 btree_node btree_read(int rrn, btree *t)
 {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    btree_node no;
-    unsigned tam_do_no = 3 + ((btree_order - 1) * t->tam_chave) + 1 + (btree_order * 3);
+    btree_node no = btree_node_malloc(t);
+    unsigned tam_do_no = 3 + ((btree_order - 1) * t->tam_chave) + 1 + (btree_order * 3) + 1;
     unsigned offset = 0;
     char p[tam_do_no + 1];
 
-    strncpy(p, t->arquivo + rrn * tam_do_no, tam_do_no);
+    strncpy(p, t->arquivo + rrn * tam_do_no, tam_do_no + 1);
     p[tam_do_no] = '\0';
 
     no.this_rrn = rrn;
@@ -2023,13 +2048,18 @@ btree_node btree_read(int rrn, btree *t)
         offset += t->tam_chave;
     }
 
+    offset++;
     // folha
-    no.folha = p[offset];
+    if (p[offset] == 'F')
+        no.folha = false;
+    else
+        no.folha = true;
     offset++;
 
     for (unsigned i = 0; i < btree_order; i++)
     {
         strncpy(temp, p + offset, 3);
+        // printf("%s\n", temp);
         temp[3] = '\0';
         if (temp[0] == '*')
         {
@@ -2048,8 +2078,48 @@ btree_node btree_read(int rrn, btree *t)
 
 void btree_write(btree_node no, btree *t)
 {
+
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "btree_write");
+    char *p = t->arquivo + no.this_rrn * t->tam_chave;
+    sprintf(p, "%03d", no.qtd_chaves);
+    // printf("%s\n", t->arquivo);
+    p += 3;
+
+    for (unsigned i = 0; i < btree_order - 1; i++)
+    {
+        if (no.chaves[i][0] != '\0')
+        {
+            printf("%s\n", no.chaves[i]);
+            strncpy(p, no.chaves[i], t->tam_chave);
+            p += t->tam_chave;
+        }
+        else
+        {
+            strpadright(p, '#', t->tam_chave + 1);
+            p += t->tam_chave + 1;
+        }
+        // printf("%s\n", t->arquivo);
+    }
+    if (no.folha)
+        *p = 'T';
+    else
+        *p = 'F';
+    // printf("%s\n", t->arquivo);
+    p += 1;
+    for (unsigned i = 0; i < btree_order; i++)
+    {
+        if (no.filhos[i] == -1)
+        {
+            sprintf(p, "***");
+        }
+        else
+        {
+            sprintf(p, "%03d", no.filhos[i]);
+        }
+        p += 3;
+        // printf("%s\n", t->arquivo);
+    }
+    p = '\0';
 }
 
 int btree_register_size(btree *t)
