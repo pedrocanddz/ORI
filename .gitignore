@@ -5,3 +5,6 @@
 replit.nix
 main
 main-debugs
+**/T02/a.c
+**/T02/a.out
+**/T02/out.txt
