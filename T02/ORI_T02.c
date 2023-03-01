@@ -5,8 +5,8 @@
  *
  * Trabalho 02 - Árvores-B
  *
- * RA:
- * Aluno:
+ * RA:800863
+ * Aluno:Pedro Henrique Candido de Sousa
  * ========================================================================== */
 
 /* Bibliotecas */
@@ -1392,16 +1392,18 @@ Curso recuperar_registro_curso(int rrn)
     token_categorias = strtok(p, "|");
     for (int i = 0; i < QTD_MAX_CATEGORIAS; i++)
     {
-        if (!token_categorias) // se nao tem mais categorias para ler(caso em que tem apenas 1 categoria)
-            break;
-        if (token_categorias[0] != '#')
+        if (!token_categorias)
+        { // se nao tem mais categorias para ler(caso em que tem apenas 1 categoria)
+            c.categorias[i][0] = '\0';
+        }
+        else if (token_categorias[0] != '#')
         {
             strcpy(c.categorias[i], token_categorias);
             token_categorias = strtok(NULL, "|");
         }
         else
         {
-            strcpy(c.categorias[i], "");
+            c.categorias[i][0] = '\0';
         }
     }
 
@@ -1758,7 +1760,28 @@ void listar_usuarios_id_menu()
 void listar_cursos_categorias_menu(char *categoria)
 {
     /* <<< COMPLETE AQUI A IMPLEMENTAÇÃO >>> */
-    printf(ERRO_NAO_IMPLEMENTADO, "listar_cursos_categorias_menu");
+    int registro = -1;
+    printf(RRN_REGS_SECUNDARIOS);
+    bool achou_categoria = inverted_list_secondary_search(&registro, true, categoria, &categorias_idx);
+    printf("\n");
+    if (!achou_categoria)
+    {
+        printf(AVISO_NENHUM_REGISTRO_ENCONTRADO);
+        return;
+    }
+    char id_curso[TAM_ID_CURSO - 1];
+    int encontrados = 0;
+    printf(RRN_REGS_PRIMARIOS);
+    encontrados = inverted_list_primary_search(&id_curso, true, registro, NULL, &categorias_idx);
+    if (encontrados == 0)
+    {
+        printf(ERRO_REGISTRO_NAO_ENCONTRADO);
+        return;
+    }
+    for (int i = 0; i < encontrados; i++)
+    {
+        exibir_curso(atoi(&id_curso[i]));
+    }
 }
 
 void listar_inscricoes_periodo_menu(char *data_inicio, char *data_fim)
@@ -1955,19 +1978,22 @@ bool inverted_list_secondary_search(int *result, bool exibir_caminho, char *chav
     strcpy(p, chave_secundaria);
     strupr(p);
     strpadright(p, '#', t->tam_chave_secundaria);
-
     int rrn;
-    bool existe = inverted_list_binary_search(&rrn, false, p, t);
+
+    bool existe = inverted_list_binary_search(&rrn, exibir_caminho, p, t);
     if (!existe)
         return false;
 
     char *sec = t->arquivo_secundario + (rrn * (t->tam_chave_secundaria + 4));
     rrn = atoi(sec + t->tam_chave_secundaria);
     char id_curso[TAM_ID_CURSO];
+    char *prim = t->arquivo_primario + (rrn * (t->tam_chave_primaria + 4));
     while (true)
     {
-        char *prim = t->arquivo_primario + (rrn * (t->tam_chave_primaria + 4));
-        int prox_reg = atoi(prim + t->tam_chave_primaria);
+        char prim_array[t->tam_chave_primaria + TAM_RRN_REGISTRO + 1];
+        strncpy(prim_array, prim, t->tam_chave_primaria + 4);
+        prim_array[t->tam_chave_primaria + TAM_RRN_REGISTRO] = '\0';
+        int prox_reg = atoi(prim_array + t->tam_chave_primaria);
         if (prox_reg == -1)
         {
             if (result)
@@ -1998,8 +2024,11 @@ int inverted_list_primary_search(char result[][TAM_CHAVE_CATEGORIAS_PRIMARIO_IDX
             printf(" %d", indice);
         if (indice_final) // se for passado o indice final, retorna o ultimo indice
             *indice_final = indice;
+        char prim_array[t->tam_chave_primaria + TAM_RRN_REGISTRO + 1];
+        strncpy(prim_array, prim, t->tam_chave_primaria + 4);
+        prim_array[t->tam_chave_primaria + TAM_RRN_REGISTRO] = '\0';
 
-        indice = atoi(prim + t->tam_chave_primaria);
+        indice = atoi(prim_array + t->tam_chave_primaria);
         cursos_encontrados++;
     }
     if (exibir_caminho)
@@ -2015,7 +2044,9 @@ bool inverted_list_binary_search(int *result, bool exibir_caminho, char *chave, 
     int mid;
     while (start <= end)
     {
-        mid = (start + end) / 2;
+        mid = start + ((end - start + 1) / 2);
+        if (exibir_caminho)
+            printf(" %d", mid);
         char *sec = t->arquivo_secundario + (mid * (t->tam_chave_secundaria + 4));
         int compar = strncmp(chave, sec, t->tam_chave_secundaria);
         if (compar == 0)
@@ -2035,6 +2066,7 @@ bool inverted_list_binary_search(int *result, bool exibir_caminho, char *chave, 
     }
     if (result)
         *result = start;
+
     return false;
 }
 
@@ -2053,6 +2085,7 @@ void btree_insert(char *chave, btree *t)
         nova_raiz.folha = true;
         t->rrn_raiz = nova_raiz.this_rrn = t->qtd_nos++;
         btree_write(nova_raiz, t);
+        btree_node_free(nova_raiz);
         return;
     }
     promovido_aux promo = btree_insert_aux(chave, t->rrn_raiz, t);
@@ -2070,6 +2103,7 @@ void btree_insert(char *chave, btree *t)
         t->rrn_raiz = newNode.this_rrn;
         promo.filho_direito = newNode.this_rrn;
         btree_write(newNode, t);
+        btree_node_free(newNode);
     }
 }
 
@@ -2106,6 +2140,7 @@ promovido_aux btree_insert_aux(char *chave, int rrn, btree *t)
             node.chaves[pos][t->tam_chave] = '\0';
             node.qtd_chaves++;
             btree_write(node, t);
+            btree_node_free(node);
             return promo;
         }
         else
@@ -2116,6 +2151,8 @@ promovido_aux btree_insert_aux(char *chave, int rrn, btree *t)
             promovido_aux promovido = btree_divide(promo, &node, pos, t);
 
             btree_write(node, t);
+            btree_node_free(node);
+
             return promovido;
         }
     }
@@ -2152,7 +2189,7 @@ promovido_aux btree_insert_aux(char *chave, int rrn, btree *t)
                 promo.filho_direito = -1;
                 node.qtd_chaves++;
                 btree_write(node, t);
-
+                btree_node_free(node);
                 return promo;
             }
             else
@@ -2160,11 +2197,13 @@ promovido_aux btree_insert_aux(char *chave, int rrn, btree *t)
                 // Nó está cheio
                 promovido_aux promovido = btree_divide(promo, &node, pos, t);
                 btree_write(node, t);
+                btree_node_free(node);
                 return promovido;
             }
         }
         else
         {
+            btree_node_free(node);
             return promo;
         }
     }
@@ -2270,6 +2309,7 @@ promovido_aux btree_divide(promovido_aux promo, btree_node *node, int i, btree *
         promo.filho_direito = new_node.this_rrn;
     }
     btree_write(new_node, t);
+    btree_node_free(new_node);
     return promo;
 }
 
